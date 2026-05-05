@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  quality:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: python -m ruff check .
+
+      - name: Test
+        run: python -m unittest discover -s tests -q
+
+      - name: Eval artifact report
+        run: python eval_runner.py --measured --write-artifacts --release-version ci --output-dir exports
+
+      - name: Upload eval artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-eval-artifacts
+          path: exports/eval-artifact-ci.*
+
+      - name: Release signing smoke test
+        env:
+          JARVIS_RELEASE_SIGNING_KEY: ${{ secrets.JARVIS_RELEASE_SIGNING_KEY || 'ci-local-signing-key-for-smoke-tests' }}
+        run: python -c "from release_security import build_release_smoke_check; check = build_release_smoke_check('ci', {'path':'dist/JARVIS.exe','sha256':'smoke'}); assert check['verification']['valid']"
+
+      - name: Build Windows release artifact
+        run: pyinstaller --noconfirm --onefile --windowed --name JARVIS arayuz.py
+
+      - name: Sign release artifact metadata
+        env:
+          JARVIS_RELEASE_SIGNING_KEY: ${{ secrets.JARVIS_RELEASE_SIGNING_KEY || 'ci-local-signing-key-for-smoke-tests' }}
+        run: python release_build.py --version ci --artifact dist/JARVIS.exe --output-dir release
+
+      - name: Build signed model catalog
+        env:
+          JARVIS_RELEASE_SIGNING_KEY: ${{ secrets.JARVIS_RELEASE_SIGNING_KEY || 'ci-local-signing-key-for-smoke-tests' }}
+        run: python model_installer.py --write-catalog release/model-catalog-ci.json
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-release-artifacts
+          path: |
+            dist/JARVIS.exe
+            release/jarvis-ci.*
+            release/model-catalog-ci.json
+
+      - name: Health check
+        env:
+          CI: "true"
+        run: python kontrol.py --no-pause

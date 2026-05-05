@@ -1,0 +1,82 @@
+# JARVIS .gitignore
+
+# Environment/secrets
+.env
+.env.*
+*.env
+!.env.example
+*token*
+*credential*
+*credentials*
+*secret*
+*.pem
+*.key
+*.p12
+*.pfx
+client_secret*.json
+
+# Local memory, setup, and runtime data
+memory.json
+user_data/
+profiles/
+gece_kodlari/
+logs/
+jarvis_setup.json
+exports/
+cache/
+tmp/
+temp/
+*.log
+*.jsonl
+*.sqlite
+*.db
+screenshots/
+generated_screenshots/
+generated_audio/
+recordings/
+*.screenshot.png
+*.screenshot.jpg
+*.capture.png
+*.wav
+*.mp3
+*.m4a
+*.screenshot
+
+# Build and release output
+build/
+dist/
+release/
+*.egg-info/
+*.spec
+*.exe
+*.zip
+*.tar.gz
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Spotify cache
+.cache
+.cache-*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/

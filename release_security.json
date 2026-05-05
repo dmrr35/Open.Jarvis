@@ -1,0 +1,10 @@
+{
+  "require_signature": true,
+  "signature_algorithm": "hmac-sha256",
+  "trusted_signers": ["ci"],
+  "key_policy": {
+    "env_var": "JARVIS_RELEASE_SIGNING_KEY",
+    "min_length": 16,
+    "rotation_days": 90
+  }
+}

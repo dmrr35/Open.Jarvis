@@ -1,0 +1,12 @@
+{
+  "trusted_signers": ["ci"],
+  "trusted_plugins": [],
+  "sandbox": {
+    "execution": "isolated",
+    "network": "restricted",
+    "filesystem": "scoped",
+    "process_spawn": false,
+    "timeout_seconds": 30,
+    "max_memory_mb": 256
+  }
+}
