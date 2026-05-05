@@ -56,61 +56,35 @@ These items are documented roadmap work. They may have planning helpers or confi
 Open.Jarvis/
 +-- .github/                CI workflow and issue templates
 +-- agents/                 Reserved for future agent implementations
-+-- commands/               Local router, Groq router, action schema, dispatcher, and domain actions
-|   +-- domains/            Runtime, media, and memory action handlers
 +-- core/                   Reserved core package area
 +-- docs/                   Architecture, threat model, plugin security, offline STT, and release docs
 +-- evals/                  Evaluation support area
++-- open_jarvis/            Main source package
+|   +-- app/                Package entry point for terminal mode
+|   +-- audio/              ses_motoru.py, speech_backend.py, tts_provider.py, voice_calibration.py
+|   +-- commands/           komutlar.py, local router, Groq router, action schema, dispatcher
+|   |   `-- domains/        Runtime, media, and memory action handlers
+|   +-- evaluation/         evaluation_suite.py, eval_runner.py, eval_artifacts.py, eval_measurements.py, performance_benchmarks.py
+|   +-- health/             health_center.py, observability.py, feature_quality.py
+|   +-- integrations/       llm_fallback.py, provider_health.py, offline_profile.py, model_installer.py, url_safety.py
+|   +-- memory/             memory_*.py, privacy_mode.py, user_profiles.py, compatibility re-exports
+|   +-- plugins/            permission_profiles.py, plugin_marketplace.py, plugin_runner.py, plugin_security.py, plugin_signature.py, plugin_state.py
+|   +-- release/            repo_hygiene.py, project_audit.py, release_build.py, maintenance.py
+|   +-- runtime/            jarvis_runtime.py, wake word, command listener, timer, orchestration, UI bridge, personality
+|   +-- security/           jarvis_admin.py, release_security.py, public_release.py, security policy helpers
+|   +-- ui/                 arayuz.py, ui_theme.py, ui_components.py, ui_*.py, memory_panel.py, security_center.py
+|   `-- utils/              kontrol.py, jarvis_logging.py
 +-- plugins/                Reserved for local plugin packages
-+-- runtime/                Wake word, command listener, timer, orchestration, UI bridge, personality
 +-- tests/                  Automated tests
-+-- arayuz.py               Main desktop UI
-+-- command_history.py      Command history and undo helpers
-+-- command_suggestions.py  Context-aware command suggestions
-+-- evaluation_suite.py     Baseline assistant eval scenarios
-+-- eval_measurements.py    Measured eval runner helpers
-+-- eval_runner.py          Eval CLI
-+-- eval_artifacts.py       Eval JSON/Markdown artifact generation and compare_eval_artifacts
-+-- feature_quality.py      Feature inventory and quality report
-+-- haftalik_guncelleme.py  Weekly update and feature idea report script
-+-- health_center.py        Health center data model and repair recommendations
-+-- jarvis.py               Terminal runtime entry point
-+-- jarvis_admin.py         Admin, environment, provider, and readiness checks
-+-- jarvis_runtime.py       Voice loop and runtime orchestration entry
-+-- komutlar.py             Command orchestration
-+-- kontrol.py              Health and install checker
-+-- llm_fallback.py         AI mode and provider selection helpers
-+-- memory.py               Compatibility layer for memory helpers
-+-- memory_*.py             Memory store, notes, habits, preferences, short-term context, insights
-+-- model_installer.py      Signed model catalog helpers: build_signed_model_catalog, verify_model_catalog, verify_model_checksum
-+-- observability.py        Runtime event and latency metric helpers
-+-- offline_profile.py      Offline STT/TTS/LLM readiness model
-+-- onboarding_engine.py    First-run setup checks
-+-- performance_benchmarks.py Performance budget helpers
-+-- permission_profiles.py  Safe, normal, and admin permission matrix
-+-- plugin_marketplace.py   Local plugin manifest and trust overview
-+-- plugin_runner.py        Scoped plugin execution helper
-+-- plugin_security.py      Plugin safety checks
-+-- plugin_signature.py     Deterministic plugin signing and verification
-+-- plugin_state.py         Plugin enablement state and build_plugin_state_audit
-+-- privacy_mode.py         Privacy sessions and secret masking
-+-- process_runner.py       Safer subprocess execution helper
-+-- project_audit.py        Static project audit
-+-- provider_health.py      Provider readiness model
-+-- public_release.py       Public GitHub release readiness report
-+-- release_build.py        Release manifest/signature flow
-+-- release_security.py     Release signing and key rotation policy
-+-- repo_hygiene.py         GitHub readiness check for local-only files
-+-- runtime_safety.py       Destructive action safety gates
-+-- security_center.py      Permission, privacy, secret, and confirmation overview
-+-- ses_motoru.py           Voice engine
-+-- speech_backend.py       Online STT and optional Vosk fallback
-+-- tts_provider.py         TTS provider selection metadata
-+-- ui_theme.py             Cyber Hologram design tokens
-+-- ui_components.py        Reusable UI components
-+-- ui_*.py                 UI pages, dialogs, rendering, onboarding, smoke, and screenshot checks
-+-- voice_calibration.py    Microphone threshold recommendation helpers
-+-- workflow_engine.py      Workflow plan model
++-- arayuz.py               Backward-compatible UI launcher
++-- jarvis.py               Backward-compatible terminal launcher
++-- kontrol.py              Backward-compatible health checker launcher
++-- repo_hygiene.py         Backward-compatible hygiene checker launcher
++-- project_audit.py        Backward-compatible static audit launcher
++-- public_release.py       Backward-compatible release readiness launcher
++-- eval_runner.py          Backward-compatible eval CLI launcher
++-- release_build.py        Backward-compatible release build launcher
++-- model_installer.py      Backward-compatible signed model catalog launcher
 +-- .env.example            API key and runtime settings template
 +-- .gitignore              Keeps secrets and generated files out of GitHub
 +-- pyproject.toml          Ruff, mypy, and coverage configuration
@@ -237,6 +211,12 @@ python arayuz.py
 ```
 
 Terminal mode:
+
+```powershell
+python -m open_jarvis.app.main
+```
+
+Backward-compatible terminal launcher:
 
 ```powershell
 python jarvis.py

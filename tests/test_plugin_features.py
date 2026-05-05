@@ -2,10 +2,10 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase
 
-from plugin_marketplace import build_marketplace
-from plugin_runner import build_plugin_execution_plan, run_plugin_in_sandbox
-from plugin_signature import sign_plugin_manifest, verify_plugin_signature
-from plugin_state import build_plugin_state, build_plugin_state_audit, disable_plugin, enable_plugin
+from open_jarvis.plugins.plugin_marketplace import build_marketplace
+from open_jarvis.plugins.plugin_runner import build_plugin_execution_plan, run_plugin_in_sandbox
+from open_jarvis.plugins.plugin_signature import sign_plugin_manifest, verify_plugin_signature
+from open_jarvis.plugins.plugin_state import build_plugin_state, build_plugin_state_audit, disable_plugin, enable_plugin
 
 
 class PluginFeaturesTest(TestCase):

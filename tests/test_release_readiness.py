@@ -3,7 +3,7 @@ from tempfile import TemporaryDirectory
 from unittest import TestCase
 from unittest.mock import patch
 
-from public_release import build_public_release_check
+from open_jarvis.security.public_release import build_public_release_check
 
 
 class ReleaseReadinessTest(TestCase):
@@ -39,7 +39,7 @@ class ReleaseReadinessTest(TestCase):
         with TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
             generated_cache = root / "__pycache__"
-            generated_pyc = generated_cache / "public_release.cpython-311.pyc"
+            generated_pyc = generated_cache / "open_jarvis.security.public_release.cpython-311.pyc"
             calls = {"count": 0}
 
             def fake_hygiene(check_root: Path):
@@ -56,7 +56,7 @@ class ReleaseReadinessTest(TestCase):
                     }
                 return {"passed": True, "items": [], "stdout": "", "stderr": "", "returncode": 0}
 
-            with patch("public_release._run_hygiene_subprocess", side_effect=fake_hygiene):
+            with patch("open_jarvis.security.public_release._run_hygiene_subprocess", side_effect=fake_hygiene):
                 check = build_public_release_check(
                     root=root,
                     env={},

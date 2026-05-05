@@ -1,9 +1,9 @@
 import unittest
 from unittest.mock import patch
 
-from commands import groq_router
-from commands.domains.memory_actions import handle_memory_action
-from commands.domains.runtime_actions import handle_runtime_action
+from open_jarvis.commands import groq_router
+from open_jarvis.commands.domains.memory_actions import handle_memory_action
+from open_jarvis.commands.domains.runtime_actions import handle_runtime_action
 
 
 class DummyLogger:
@@ -30,8 +30,8 @@ class MediumAssistantFeaturesTests(unittest.TestCase):
             chat = type("Chat", (), {"completions": RateLimitedCompletions()})()
 
         with (
-            patch("commands.groq_router.is_groq_cooling_down", return_value=False),
-            patch("commands.groq_router.activate_groq_cooldown") as cooldown_mock,
+            patch("open_jarvis.commands.groq_router.is_groq_cooling_down", return_value=False),
+            patch("open_jarvis.commands.groq_router.activate_groq_cooldown") as cooldown_mock,
         ):
             result = groq_router.analyze_with_groq("open chrome", client=DummyClient(), logger=DummyLogger())
 
@@ -44,7 +44,7 @@ class MediumAssistantFeaturesTests(unittest.TestCase):
         context = {"speak": spoken.append, "logger": DummyLogger(), "summarize_text": lambda text: None}
         text = "First sentence is useful. Second sentence has detail. Third sentence is extra."
 
-        with patch("commands.domains.runtime_actions.pyperclip.paste", return_value=text):
+        with patch("open_jarvis.commands.domains.runtime_actions.pyperclip.paste", return_value=text):
             result = handle_runtime_action("summarize_clipboard", {}, context)
 
         self.assertTrue(result)
@@ -56,8 +56,8 @@ class MediumAssistantFeaturesTests(unittest.TestCase):
         context = {"speak": spoken.append, "logger": DummyLogger()}
 
         with (
-            patch("commands.domains.memory_actions.get_stats", return_value={"total_commands": 8, "notes_count": 2, "habits_count": 1}),
-            patch("commands.domains.memory_actions.summarize_recent_activity", return_value="Recent activity summary."),
+            patch("open_jarvis.commands.domains.memory_actions.get_stats", return_value={"total_commands": 8, "notes_count": 2, "habits_count": 1}),
+            patch("open_jarvis.commands.domains.memory_actions.summarize_recent_activity", return_value="Recent activity summary."),
         ):
             result = handle_memory_action("daily_summary", {}, context)
 

@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-import commands.domains.media_actions as media_actions
-from commands.domains.media_actions import clamp_volume, get_spotify_client
+import open_jarvis.commands.domains.media_actions as media_actions
+from open_jarvis.commands.domains.media_actions import clamp_volume, get_spotify_client
 
 
 class DummyLogger:

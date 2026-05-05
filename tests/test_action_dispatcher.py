@@ -1,9 +1,9 @@
 import unittest
 from unittest.mock import patch
 
-from commands.action_dispatcher import execute_action
-from commands.domains.memory_actions import handle_memory_action
-from commands.domains.runtime_actions import env_float, handle_runtime_action
+from open_jarvis.commands.action_dispatcher import execute_action
+from open_jarvis.commands.domains.memory_actions import handle_memory_action
+from open_jarvis.commands.domains.runtime_actions import env_float, handle_runtime_action
 
 
 class DummyLogger:
@@ -29,7 +29,7 @@ class ActionDispatcherTest(unittest.TestCase):
             "summarize_text": lambda text: "summary",
         }
 
-        with patch("commands.action_dispatcher.execute_single_action", return_value=True) as single_mock:
+        with patch("open_jarvis.commands.action_dispatcher.execute_single_action", return_value=True) as single_mock:
             result = execute_action(
                 {"action": "get_time", "params": {}, "response": "Opening time, sir."},
                 context,
@@ -44,8 +44,8 @@ class ActionDispatcherTest(unittest.TestCase):
 
         with (
             patch.dict("os.environ", {"JARVIS_ACTION_SEQUENCE_DELAY": "0"}),
-            patch("commands.action_dispatcher.execute_single_action", return_value=True),
-            patch("commands.action_dispatcher.time.sleep") as sleep_mock,
+            patch("open_jarvis.commands.action_dispatcher.execute_single_action", return_value=True),
+            patch("open_jarvis.commands.action_dispatcher.time.sleep") as sleep_mock,
         ):
             result = execute_action({"actions": [{"action": "get_time"}, {"action": "get_date"}]}, context)
 
@@ -78,7 +78,7 @@ class ActionDispatcherTest(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger(), "summarize_text": lambda text: "summary"}
 
-        with patch("commands.domains.runtime_actions.webbrowser.open") as open_mock:
+        with patch("open_jarvis.commands.domains.runtime_actions.webbrowser.open") as open_mock:
             result = handle_runtime_action("open_web", {"url": "https://example.com"}, context)
 
         self.assertTrue(result)
@@ -92,10 +92,10 @@ class ActionDispatcherTest(unittest.TestCase):
             self.assertEqual(env_float("JARVIS_BAD_FLOAT", 0.5), 0.5)
 
         with (
-            patch("commands.domains.runtime_actions.os.path.exists", return_value=True),
-            patch("commands.domains.runtime_actions.launch_process") as launch_mock,
-            patch("commands.domains.runtime_actions.record_runtime_event") as event_mock,
-            patch("commands.domains.runtime_actions.time.sleep"),
+            patch("open_jarvis.commands.domains.runtime_actions.os.path.exists", return_value=True),
+            patch("open_jarvis.commands.domains.runtime_actions.launch_process") as launch_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.record_runtime_event") as event_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.time.sleep"),
             patch.dict("os.environ", {"JARVIS_APP_LAUNCH_DELAY": "0"}),
         ):
             result = handle_runtime_action("open_app", {"app": "notepad"}, context)
@@ -108,10 +108,10 @@ class ActionDispatcherTest(unittest.TestCase):
         context = {"speak": lambda text: None, "logger": DummyLogger()}
 
         with (
-            patch("commands.domains.runtime_actions.os.path.exists", return_value=False),
-            patch("commands.domains.runtime_actions.launch_process") as launch_mock,
-            patch("commands.domains.runtime_actions.record_runtime_event") as event_mock,
-            patch("commands.domains.runtime_actions.time.sleep"),
+            patch("open_jarvis.commands.domains.runtime_actions.os.path.exists", return_value=False),
+            patch("open_jarvis.commands.domains.runtime_actions.launch_process") as launch_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.record_runtime_event") as event_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.time.sleep"),
             patch.dict("os.environ", {"JARVIS_APP_LAUNCH_DELAY": "0"}),
         ):
             result = handle_runtime_action("open_app", {"app": "calc"}, context)
@@ -124,7 +124,7 @@ class ActionDispatcherTest(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger()}
 
-        with patch("commands.domains.runtime_actions.webbrowser.open") as open_mock:
+        with patch("open_jarvis.commands.domains.runtime_actions.webbrowser.open") as open_mock:
             result = handle_runtime_action("open_web", {"url": "file:///secret"}, context)
 
         self.assertFalse(result)
@@ -137,9 +137,9 @@ class ActionDispatcherTest(unittest.TestCase):
         context = {"speak": spoken.append, "logger": logger}
 
         with (
-            patch("commands.domains.runtime_actions.run_command") as run_mock,
-            patch("commands.domains.runtime_actions.record_runtime_event") as event_mock,
-            patch("commands.domains.runtime_actions.is_destructive_action_allowed", return_value=False),
+            patch("open_jarvis.commands.domains.runtime_actions.run_command") as run_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.record_runtime_event") as event_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.is_destructive_action_allowed", return_value=False),
         ):
             result = handle_runtime_action("shutdown", {}, context)
 
@@ -151,7 +151,7 @@ class ActionDispatcherTest(unittest.TestCase):
     def test_runtime_handler_searches_google(self):
         context = {"speak": lambda text: None, "logger": DummyLogger()}
 
-        with patch("commands.domains.runtime_actions.webbrowser.open") as open_mock:
+        with patch("open_jarvis.commands.domains.runtime_actions.webbrowser.open") as open_mock:
             result = handle_runtime_action("search_google", {"query": "jarvis runtime coverage"}, context)
 
         self.assertTrue(result)
@@ -173,7 +173,7 @@ class ActionDispatcherTest(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger()}
 
-        with patch("commands.domains.runtime_actions.psutil.sensors_battery", return_value=None):
+        with patch("open_jarvis.commands.domains.runtime_actions.psutil.sensors_battery", return_value=None):
             result = handle_runtime_action("get_battery", {}, context)
 
         self.assertTrue(result)
@@ -183,7 +183,7 @@ class ActionDispatcherTest(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger()}
 
-        with patch("commands.domains.runtime_actions.pyperclip.paste", return_value=""):
+        with patch("open_jarvis.commands.domains.runtime_actions.pyperclip.paste", return_value=""):
             result = handle_runtime_action("read_clipboard", {}, context)
 
         self.assertTrue(result)
@@ -193,7 +193,7 @@ class ActionDispatcherTest(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger()}
 
-        with patch("commands.domains.runtime_actions.pyperclip.paste", return_value="x" * 900):
+        with patch("open_jarvis.commands.domains.runtime_actions.pyperclip.paste", return_value="x" * 900):
             result = handle_runtime_action("read_clipboard", {}, context)
 
         self.assertTrue(result)
@@ -204,7 +204,7 @@ class ActionDispatcherTest(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger(), "summarize_text": lambda text: f"summary:{text}"}
 
-        with patch("commands.domains.runtime_actions.pyperclip.paste", return_value="long text"):
+        with patch("open_jarvis.commands.domains.runtime_actions.pyperclip.paste", return_value="long text"):
             result = handle_runtime_action("summarize_clipboard", {}, context)
 
         self.assertTrue(result)
@@ -214,7 +214,7 @@ class ActionDispatcherTest(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger(), "summarize_text": lambda text: None}
 
-        with patch("commands.domains.runtime_actions.pyperclip.paste", side_effect=["", "important text"]):
+        with patch("open_jarvis.commands.domains.runtime_actions.pyperclip.paste", side_effect=["", "important text"]):
             self.assertTrue(handle_runtime_action("summarize_clipboard", {}, context))
             self.assertTrue(handle_runtime_action("summarize_clipboard", {}, context))
 
@@ -226,11 +226,11 @@ class ActionDispatcherTest(unittest.TestCase):
         context = {"speak": spoken.append, "logger": DummyLogger()}
 
         with (
-            patch("commands.domains.runtime_actions.time.sleep"),
-            patch("commands.domains.runtime_actions.pyautogui.typewrite") as typewrite_mock,
-            patch("commands.domains.runtime_actions.pyautogui.hotkey") as hotkey_mock,
-            patch("commands.domains.runtime_actions.pyautogui.click") as click_mock,
-            patch("commands.domains.runtime_actions.pyautogui.scroll") as scroll_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.time.sleep"),
+            patch("open_jarvis.commands.domains.runtime_actions.pyautogui.typewrite") as typewrite_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.pyautogui.hotkey") as hotkey_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.pyautogui.click") as click_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.pyautogui.scroll") as scroll_mock,
         ):
             self.assertTrue(handle_runtime_action("type_text", {"text": "hello"}, context))
             self.assertTrue(handle_runtime_action("press_key", {"key": "ctrl+c"}, context))
@@ -246,11 +246,11 @@ class ActionDispatcherTest(unittest.TestCase):
         context = {"speak": lambda text: None, "logger": DummyLogger()}
 
         with (
-            patch("commands.domains.runtime_actions.time.sleep"),
-            patch("commands.domains.runtime_actions.pyautogui.typewrite") as typewrite_mock,
-            patch("commands.domains.runtime_actions.pyautogui.press") as press_mock,
-            patch("commands.domains.runtime_actions.pyautogui.doubleClick") as double_mock,
-            patch("commands.domains.runtime_actions.pyautogui.scroll") as scroll_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.time.sleep"),
+            patch("open_jarvis.commands.domains.runtime_actions.pyautogui.typewrite") as typewrite_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.pyautogui.press") as press_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.pyautogui.doubleClick") as double_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.pyautogui.scroll") as scroll_mock,
         ):
             self.assertTrue(handle_runtime_action("type_text", {}, context))
             self.assertTrue(handle_runtime_action("press_key", {"key": "enter"}, context))
@@ -276,13 +276,13 @@ class ActionDispatcherTest(unittest.TestCase):
             total = 16 * 1024**3
 
         with (
-            patch("commands.domains.runtime_actions.psutil.sensors_battery", return_value=Battery()),
-            patch("commands.domains.runtime_actions.psutil.virtual_memory", return_value=Memory()),
-            patch("commands.domains.runtime_actions.psutil.cpu_percent", return_value=12.5),
-            patch("commands.domains.runtime_actions.pyautogui.hotkey") as hotkey_mock,
-            patch("commands.domains.runtime_actions.run_command") as run_mock,
-            patch("commands.domains.runtime_actions.is_destructive_action_allowed", return_value=True),
-            patch("commands.domains.runtime_actions.time.sleep"),
+            patch("open_jarvis.commands.domains.runtime_actions.psutil.sensors_battery", return_value=Battery()),
+            patch("open_jarvis.commands.domains.runtime_actions.psutil.virtual_memory", return_value=Memory()),
+            patch("open_jarvis.commands.domains.runtime_actions.psutil.cpu_percent", return_value=12.5),
+            patch("open_jarvis.commands.domains.runtime_actions.pyautogui.hotkey") as hotkey_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.run_command") as run_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.is_destructive_action_allowed", return_value=True),
+            patch("open_jarvis.commands.domains.runtime_actions.time.sleep"),
             patch.dict("os.environ", {"JARVIS_CPU_SAMPLE_INTERVAL": "0"}),
         ):
             self.assertTrue(handle_runtime_action("get_battery", {}, context))
@@ -308,11 +308,11 @@ class ActionDispatcherTest(unittest.TestCase):
                 self.path = path
 
         with (
-            patch("commands.domains.runtime_actions.os.makedirs") as makedirs_mock,
-            patch("commands.domains.runtime_actions.pyautogui.screenshot", return_value=Screenshot()),
-            patch("commands.domains.runtime_actions.launch_process") as launch_mock,
-            patch("commands.domains.runtime_actions.time.sleep"),
-            patch("commands.domains.runtime_actions.pyperclip.paste", side_effect=RuntimeError("clipboard locked")),
+            patch("open_jarvis.commands.domains.runtime_actions.os.makedirs") as makedirs_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.pyautogui.screenshot", return_value=Screenshot()),
+            patch("open_jarvis.commands.domains.runtime_actions.launch_process") as launch_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.time.sleep"),
+            patch("open_jarvis.commands.domains.runtime_actions.pyperclip.paste", side_effect=RuntimeError("clipboard locked")),
             patch.dict("os.environ", {"USERPROFILE": "C:\\Users\\W10"}),
         ):
             self.assertTrue(handle_runtime_action("screenshot", {}, context))
@@ -331,8 +331,8 @@ class ActionDispatcherTest(unittest.TestCase):
         context = {"speak": spoken.append, "logger": logger}
 
         with (
-            patch("commands.domains.runtime_actions.os.path.exists", return_value=False),
-            patch("commands.domains.runtime_actions.launch_process", side_effect=OSError("missing")),
+            patch("open_jarvis.commands.domains.runtime_actions.os.path.exists", return_value=False),
+            patch("open_jarvis.commands.domains.runtime_actions.launch_process", side_effect=OSError("missing")),
         ):
             result = handle_runtime_action("open_app", {"app": "missing_app"}, context)
 
@@ -344,9 +344,9 @@ class ActionDispatcherTest(unittest.TestCase):
         context = {"speak": lambda text: None, "logger": DummyLogger()}
 
         with (
-            patch("commands.domains.runtime_actions.is_destructive_action_allowed", return_value=True),
-            patch("commands.domains.runtime_actions.run_command") as run_mock,
-            patch("commands.domains.runtime_actions.time.sleep") as sleep_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.is_destructive_action_allowed", return_value=True),
+            patch("open_jarvis.commands.domains.runtime_actions.run_command") as run_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.time.sleep") as sleep_mock,
             patch.dict("os.environ", {"JARVIS_SLEEP_ACTION_DELAY": "0"}),
         ):
             self.assertTrue(handle_runtime_action("sleep", {}, context))
@@ -360,9 +360,9 @@ class ActionDispatcherTest(unittest.TestCase):
         context = {"speak": lambda text: None, "logger": DummyLogger()}
 
         with (
-            patch("commands.domains.runtime_actions.is_destructive_action_allowed", return_value=True),
-            patch("commands.domains.runtime_actions.run_command"),
-            patch("commands.domains.runtime_actions.time.sleep") as sleep_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.is_destructive_action_allowed", return_value=True),
+            patch("open_jarvis.commands.domains.runtime_actions.run_command"),
+            patch("open_jarvis.commands.domains.runtime_actions.time.sleep") as sleep_mock,
             patch.dict("os.environ", {"JARVIS_SLEEP_ACTION_DELAY": "0.25"}),
         ):
             self.assertTrue(handle_runtime_action("sleep", {}, context))
@@ -373,7 +373,7 @@ class ActionDispatcherTest(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger()}
 
-        with patch("commands.domains.memory_actions.get_notes", return_value=[{"text": "alpha"}, {"text": "beta"}]):
+        with patch("open_jarvis.commands.domains.memory_actions.get_notes", return_value=[{"text": "alpha"}, {"text": "beta"}]):
             result = handle_memory_action("read_notes", {}, context)
 
         self.assertTrue(result)
@@ -384,7 +384,7 @@ class ActionDispatcherTest(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger()}
 
-        with patch("commands.domains.memory_actions.get_stats") as stats_mock:
+        with patch("open_jarvis.commands.domains.memory_actions.get_stats") as stats_mock:
             stats_mock.return_value = {"total_commands": 7, "notes_count": 2, "habits_count": 1}
             result = handle_memory_action("memory_stats", {}, context)
 
@@ -398,12 +398,12 @@ class ActionDispatcherTest(unittest.TestCase):
         context = {"speak": spoken.append, "logger": logger}
 
         with (
-            patch("commands.domains.memory_actions.get_top_habits", side_effect=[[("open chrome", 3)], []]),
-            patch("commands.domains.memory_actions.build_memory_health_report", return_value={"score": 82, "recommendation": "Healthy."}),
-            patch("commands.domains.memory_actions.summarize_recent_activity", return_value="Recent activity summary."),
-            patch("commands.domains.memory_actions.prune_memory", return_value={"notes": [1, 2], "habits": {"open": 1}}),
-            patch("commands.domains.memory_actions.add_note") as add_note_mock,
-            patch("commands.domains.memory_actions.get_notes", return_value=[]),
+            patch("open_jarvis.commands.domains.memory_actions.get_top_habits", side_effect=[[("open chrome", 3)], []]),
+            patch("open_jarvis.commands.domains.memory_actions.build_memory_health_report", return_value={"score": 82, "recommendation": "Healthy."}),
+            patch("open_jarvis.commands.domains.memory_actions.summarize_recent_activity", return_value="Recent activity summary."),
+            patch("open_jarvis.commands.domains.memory_actions.prune_memory", return_value={"notes": [1, 2], "habits": {"open": 1}}),
+            patch("open_jarvis.commands.domains.memory_actions.add_note") as add_note_mock,
+            patch("open_jarvis.commands.domains.memory_actions.get_notes", return_value=[]),
         ):
             self.assertTrue(handle_memory_action("memory_habits", {}, context))
             self.assertTrue(handle_memory_action("memory_habits", {}, context))
@@ -425,7 +425,7 @@ class ActionDispatcherTest(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger(), "privacy_mode": True}
 
-        with patch("commands.domains.memory_actions.add_note") as add_note_mock:
+        with patch("open_jarvis.commands.domains.memory_actions.add_note") as add_note_mock:
             result = handle_memory_action("add_note", {"text": "secret"}, context)
 
         self.assertTrue(result)
@@ -436,7 +436,7 @@ class ActionDispatcherTest(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger()}
 
-        with patch("commands.domains.memory_actions.add_note") as add_note_mock:
+        with patch("open_jarvis.commands.domains.memory_actions.add_note") as add_note_mock:
             self.assertTrue(handle_memory_action("add_note", {"text": "ship runtime package"}, context))
             self.assertIsNone(handle_memory_action("unknown_memory_action", {}, context))
 

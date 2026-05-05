@@ -45,7 +45,7 @@ recordings/
 # Build and release output
 build/
 dist/
-release/
+/release/
 *.egg-info/
 *.spec
 *.exe

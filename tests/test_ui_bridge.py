@@ -1,6 +1,6 @@
 import unittest
 
-from runtime import ui_bridge
+from open_jarvis.runtime import ui_bridge
 
 
 class UiBridgeTest(unittest.TestCase):

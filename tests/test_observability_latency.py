@@ -4,14 +4,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from observability import build_latency_snapshot, record_latency_metric, record_runtime_event
+from open_jarvis.health.observability import build_latency_snapshot, record_latency_metric, record_runtime_event
 
 
 class ObservabilityLatencyTests(unittest.TestCase):
     def test_record_latency_metric_writes_structured_runtime_event(self):
         with TemporaryDirectory() as tmp:
             event_log = Path(tmp) / "runtime_events.jsonl"
-            with patch("observability.EVENT_LOG", event_log):
+            with patch("open_jarvis.health.observability.EVENT_LOG", event_log):
                 record_latency_metric("llm", 123.45, provider="groq", command="open chrome")
                 snapshot = build_latency_snapshot()
 
@@ -23,7 +23,7 @@ class ObservabilityLatencyTests(unittest.TestCase):
     def test_record_runtime_event_masks_sensitive_detail_and_context(self):
         with TemporaryDirectory() as tmp:
             event_log = Path(tmp) / "runtime_events.jsonl"
-            with patch("observability.EVENT_LOG", event_log):
+            with patch("open_jarvis.health.observability.EVENT_LOG", event_log):
                 record_runtime_event(
                     "secret_test",
                     "GROQ_API_KEY=abc123 failed",

@@ -1,6 +1,6 @@
 import unittest
 
-from commands.local_intent_router import normalize_command, route_local_intent
+from open_jarvis.commands.local_intent_router import normalize_command, route_local_intent
 
 
 class LocalIntentRouterTests(unittest.TestCase):

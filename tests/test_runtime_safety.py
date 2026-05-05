@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-from commands.domains.runtime_actions import handle_runtime_action
-from runtime_safety import build_confirmation_prompt, is_destructive_action_allowed, requires_confirmation
+from open_jarvis.commands.domains.runtime_actions import handle_runtime_action
+from open_jarvis.runtime.runtime_safety import build_confirmation_prompt, is_destructive_action_allowed, requires_confirmation
 
 
 class DummyLogger:
@@ -18,7 +18,7 @@ class RuntimeSafetyTests(unittest.TestCase):
         spoken = []
         context = {"speak": spoken.append, "logger": DummyLogger()}
 
-        with patch("commands.domains.runtime_actions.run_command") as run_mock:
+        with patch("open_jarvis.commands.domains.runtime_actions.run_command") as run_mock:
             result = handle_runtime_action("shutdown", {}, context)
 
         self.assertFalse(result)
@@ -46,7 +46,7 @@ class RuntimeSafetyTests(unittest.TestCase):
 
         with (
             patch.dict("os.environ", {"JARVIS_CPU_SAMPLE_INTERVAL": "0.05"}),
-            patch("commands.domains.runtime_actions.psutil.cpu_percent", return_value=12) as cpu_mock,
+            patch("open_jarvis.commands.domains.runtime_actions.psutil.cpu_percent", return_value=12) as cpu_mock,
         ):
             result = handle_runtime_action("get_cpu", {}, context)
 
@@ -55,7 +55,7 @@ class RuntimeSafetyTests(unittest.TestCase):
         self.assertIn("12", spoken[0])
 
     def test_runtime_delays_are_configurable(self):
-        from commands.domains.runtime_actions import app_launch_delay, desktop_action_delay
+        from open_jarvis.commands.domains.runtime_actions import app_launch_delay, desktop_action_delay
 
         with patch.dict("os.environ", {"JARVIS_APP_LAUNCH_DELAY": "0", "JARVIS_SCREENSHOT_DELAY": "0.03"}):
             self.assertEqual(app_launch_delay(), 0)

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from runtime import voice_personality
+from open_jarvis.runtime import voice_personality
 
 
 class DummyLogger:
@@ -16,7 +16,7 @@ class VoicePersonalityTest(unittest.TestCase):
     def test_greet_routes_morning_message(self):
         spoken = []
 
-        with patch("runtime.voice_personality.datetime.datetime") as dt:
+        with patch("open_jarvis.runtime.voice_personality.datetime.datetime") as dt:
             dt.now.return_value.hour = 9
             voice_personality.greet(speak=spoken.append, send_log=spoken.append)
 
@@ -39,8 +39,8 @@ class VoicePersonalityTest(unittest.TestCase):
         spoken = []
 
         with (
-            patch("runtime.voice_personality.datetime.datetime") as dt,
-            patch("runtime.voice_personality.random.choice", return_value="Farewell, sir."),
+            patch("open_jarvis.runtime.voice_personality.datetime.datetime") as dt,
+            patch("open_jarvis.runtime.voice_personality.random.choice", return_value="Farewell, sir."),
         ):
             dt.now.return_value.hour = 14
             voice_personality.say_goodbye(speak=spoken.append)
@@ -50,7 +50,7 @@ class VoicePersonalityTest(unittest.TestCase):
     def test_say_goodbye_reports_tts_failure_without_raising(self):
         logs = []
 
-        with patch("runtime.voice_personality.random.choice", return_value="Farewell, sir."):
+        with patch("open_jarvis.runtime.voice_personality.random.choice", return_value="Farewell, sir."):
             voice_personality.say_goodbye(
                 speak=lambda _text: (_ for _ in ()).throw(RuntimeError("audio offline")),
                 send_log=logs.append,
@@ -64,8 +64,8 @@ class VoicePersonalityTest(unittest.TestCase):
         state = {"command_count": 4, "joke_interval": 5}
 
         with (
-            patch("runtime.voice_personality.random.randint", return_value=6),
-            patch("runtime.voice_personality.random.choice", return_value="A joke, sir."),
+            patch("open_jarvis.runtime.voice_personality.random.randint", return_value=6),
+            patch("open_jarvis.runtime.voice_personality.random.choice", return_value="A joke, sir."),
         ):
             voice_personality.maybe_tell_joke(speak=spoken.append, send_log=spoken.append, logger=DummyLogger(), state=state)
 
@@ -78,8 +78,8 @@ class VoicePersonalityTest(unittest.TestCase):
         state = {"command_count": 4, "joke_interval": 5}
 
         with (
-            patch("runtime.voice_personality.random.randint", return_value=6),
-            patch("runtime.voice_personality.random.choice", return_value="A joke, sir."),
+            patch("open_jarvis.runtime.voice_personality.random.randint", return_value=6),
+            patch("open_jarvis.runtime.voice_personality.random.choice", return_value="A joke, sir."),
         ):
             voice_personality.maybe_tell_joke(
                 speak=lambda _text: (_ for _ in ()).throw(RuntimeError("audio offline")),

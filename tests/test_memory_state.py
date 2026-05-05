@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-import memory_preferences
-import memory_state
+import open_jarvis.memory.memory_preferences as memory_preferences
+import open_jarvis.memory.memory_state as memory_state
 
 
 class MemoryStateTests(unittest.TestCase):
@@ -18,20 +18,22 @@ class MemoryStateTests(unittest.TestCase):
         self.assertEqual(memory_state.get_short_term(), [])
 
     def test_detect_and_save_preference_routes_music_and_volume(self):
-        with patch("memory_preferences.set_preference") as set_preference:
+        with patch("open_jarvis.memory.memory_preferences.set_preference") as set_preference:
             response = memory_state.detect_and_save_preference("always play eminem")
 
         self.assertIn("eminem", response.lower())
         set_preference.assert_called_with("favorite_music", "eminem")
 
-        with patch("memory_preferences.set_preference") as set_preference:
+        with patch("open_jarvis.memory.memory_preferences.set_preference") as set_preference:
             response = memory_state.detect_and_save_preference("set volume to 70 by default")
 
         self.assertIn("70", response)
         set_preference.assert_called_with("preferred_volume", 70)
 
     def test_memory_state_reexports_split_modules(self):
-        self.assertIs(memory_state.add_to_short_term, __import__("memory_short_term").add_to_short_term)
+        from open_jarvis.memory import memory_short_term
+
+        self.assertIs(memory_state.add_to_short_term, memory_short_term.add_to_short_term)
         self.assertIs(memory_state.set_preference, memory_preferences.set_preference)
 
 

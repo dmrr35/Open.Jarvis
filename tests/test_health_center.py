@@ -2,7 +2,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase
 
-from health_center import apply_health_fix, apply_safe_health_fixes, build_health_center, rotate_logs
+from open_jarvis.health.health_center import apply_health_fix, apply_safe_health_fixes, build_health_center, rotate_logs
 
 
 class HealthCenterTests(TestCase):

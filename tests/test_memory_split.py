@@ -1,10 +1,10 @@
 import unittest
 from unittest.mock import patch
 
-import memory_habits
-import memory_notes
-import memory_preferences
-import memory_short_term
+import open_jarvis.memory.memory_habits as memory_habits
+import open_jarvis.memory.memory_notes as memory_notes
+import open_jarvis.memory.memory_preferences as memory_preferences
+import open_jarvis.memory.memory_short_term as memory_short_term
 
 
 class MemorySplitTests(unittest.TestCase):
@@ -18,18 +18,18 @@ class MemorySplitTests(unittest.TestCase):
 
     def test_track_command_updates_top_habits(self):
         memory = {"habits": {}, "total_commands": 0, "preferences": {}, "notes": []}
-        with patch("memory_habits.load_memory", return_value=memory), patch("memory_habits.save_memory") as save_mock:
+        with patch("open_jarvis.memory.memory_habits.load_memory", return_value=memory), patch("open_jarvis.memory.memory_habits.save_memory") as save_mock:
             memory_habits.track_command("open chrome")
 
         save_mock.assert_called_once()
 
     def test_preferences_and_notes_are_routed(self):
-        with patch("memory_preferences.set_preference") as set_pref:
+        with patch("open_jarvis.memory.memory_preferences.set_preference") as set_pref:
             result = memory_preferences.detect_and_save_preference("always open chrome")
         self.assertIn("chrome", result)
         set_pref.assert_called_with("favorite_app", "chrome")
 
-        with patch("memory_notes.load_memory", return_value={"notes": []}), patch("memory_notes.save_memory") as save_mock:
+        with patch("open_jarvis.memory.memory_notes.load_memory", return_value={"notes": []}), patch("open_jarvis.memory.memory_notes.save_memory") as save_mock:
             memory_notes.add_note("buy milk")
         save_mock.assert_called_once()
 

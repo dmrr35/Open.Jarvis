@@ -1,7 +1,7 @@
 import unittest
 
-from memory import DEFAULT_MEMORY
-from memory_insights import build_memory_health_report, get_memory_quality_score, summarize_recent_activity
+from open_jarvis.memory import DEFAULT_MEMORY
+from open_jarvis.memory.memory_insights import build_memory_health_report, get_memory_quality_score, summarize_recent_activity
 
 
 class MemoryInsightsTests(unittest.TestCase):

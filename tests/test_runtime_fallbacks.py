@@ -1,14 +1,14 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from runtime import command_listener, readiness
+from open_jarvis.runtime import command_listener, readiness
 
 
 class RuntimeFallbackTests(unittest.TestCase):
     def test_command_listener_reports_missing_microphone_without_raising(self):
         logs = []
 
-        with patch("runtime.command_listener.sr.Microphone", side_effect=OSError("no input device")):
+        with patch("open_jarvis.runtime.command_listener.sr.Microphone", side_effect=OSError("no input device")):
             result = command_listener.listen_for_command(logger=Mock(), send_log=logs.append, speak=Mock())
 
         self.assertEqual(result, "")

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from commands import groq_router
+from open_jarvis.commands import groq_router
 
 
 class DummyLogger:

@@ -1,6 +1,6 @@
 import unittest
 
-from commands.action_schema import validate_action_payload
+from open_jarvis.commands.action_schema import validate_action_payload
 
 
 class ActionSchemaTests(unittest.TestCase):

@@ -1,18 +1,18 @@
 import unittest
 from unittest.mock import patch
 
-import komutlar
+import open_jarvis.commands.komutlar as komutlar
 
 
 class ProcessCommandLocalRouterTests(unittest.TestCase):
     def test_process_command_executes_local_action_before_groq(self):
         with (
-            patch("komutlar.add_to_short_term"),
-            patch("komutlar.track_command"),
-            patch("komutlar.detect_and_save_preference", return_value=None),
-            patch("komutlar.route_local_intent", return_value={"action": "get_time", "params": {}, "response": ""}) as local_mock,
-            patch("komutlar.analyze_with_groq") as groq_mock,
-            patch("komutlar.execute_action", return_value=True) as execute_mock,
+            patch("open_jarvis.commands.komutlar.add_to_short_term"),
+            patch("open_jarvis.commands.komutlar.track_command"),
+            patch("open_jarvis.commands.komutlar.detect_and_save_preference", return_value=None),
+            patch("open_jarvis.commands.komutlar.route_local_intent", return_value={"action": "get_time", "params": {}, "response": ""}) as local_mock,
+            patch("open_jarvis.commands.komutlar.analyze_with_groq") as groq_mock,
+            patch("open_jarvis.commands.komutlar.execute_action", return_value=True) as execute_mock,
         ):
             result = komutlar.process_command("what time is it")
 
@@ -25,12 +25,12 @@ class ProcessCommandLocalRouterTests(unittest.TestCase):
         groq_action = {"action": "talk", "params": {}, "response": "At once, sir."}
 
         with (
-            patch("komutlar.add_to_short_term"),
-            patch("komutlar.track_command"),
-            patch("komutlar.detect_and_save_preference", return_value=None),
-            patch("komutlar.route_local_intent", return_value=None),
-            patch("komutlar.analyze_with_groq", return_value=groq_action) as groq_mock,
-            patch("komutlar.execute_action", return_value=True) as execute_mock,
+            patch("open_jarvis.commands.komutlar.add_to_short_term"),
+            patch("open_jarvis.commands.komutlar.track_command"),
+            patch("open_jarvis.commands.komutlar.detect_and_save_preference", return_value=None),
+            patch("open_jarvis.commands.komutlar.route_local_intent", return_value=None),
+            patch("open_jarvis.commands.komutlar.analyze_with_groq", return_value=groq_action) as groq_mock,
+            patch("open_jarvis.commands.komutlar.execute_action", return_value=True) as execute_mock,
         ):
             result = komutlar.process_command("please plan my morning")
 
@@ -50,11 +50,11 @@ class ProcessCommandLocalRouterTests(unittest.TestCase):
         for command in commands:
             with self.subTest(command=command):
                 with (
-                    patch("komutlar.add_to_short_term"),
-                    patch("komutlar.track_command"),
-                    patch("komutlar.detect_and_save_preference", return_value=None),
-                    patch("komutlar.analyze_with_groq") as groq_mock,
-                    patch("komutlar.execute_action", return_value=True) as execute_mock,
+                    patch("open_jarvis.commands.komutlar.add_to_short_term"),
+                    patch("open_jarvis.commands.komutlar.track_command"),
+                    patch("open_jarvis.commands.komutlar.detect_and_save_preference", return_value=None),
+                    patch("open_jarvis.commands.komutlar.analyze_with_groq") as groq_mock,
+                    patch("open_jarvis.commands.komutlar.execute_action", return_value=True) as execute_mock,
                 ):
                     result = komutlar.process_command(command)
 

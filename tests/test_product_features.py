@@ -2,34 +2,39 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase
 
-from command_history import CommandHistory
-from command_suggestions import suggest_commands
-from e2e_readiness import build_e2e_readiness_plan
-from error_messages import build_user_error
-from eval_artifacts import build_eval_artifact, compare_eval_artifacts, write_eval_artifacts
-from eval_measurements import run_measured_eval_suite
-from eval_runner import run_eval_suite
-from evaluation_suite import build_eval_suite, summarize_eval_results
-from feature_quality import build_feature_catalog, build_feature_quality_report, render_feature_quality_report
-from llm_fallback import build_provider_result, resolve_ai_mode, select_llm_provider
-from maintenance import build_maintenance_plan
-from memory_panel import build_memory_panel, delete_note, update_preference
-from model_installer import build_model_install_plan, build_signed_model_catalog, verify_model_catalog, verify_model_checksum
-from model_installer import main as model_installer_main
-from offline_profile import build_offline_profile
-from onboarding_engine import build_onboarding_result
-from performance_benchmarks import build_performance_budget, summarize_benchmark_results
-from permission_profiles import action_allowed, build_permission_matrix, get_active_permission_profile
-from privacy_mode import build_privacy_session, mask_sensitive_text, mask_sensitive_value
-from release_build import build_release_artifacts, build_windows_release_plan, compute_file_sha256
-from release_build import main as release_build_main
-from release_panel import build_release_panel
-from release_security import build_key_rotation_plan, build_release_manifest, validate_release_environment
-from security_center import build_security_overview
-from tts_provider import build_tts_provider_options, select_tts_provider
-from user_profiles import build_user_profile, merge_user_profile
-from voice_calibration import build_calibration_recommendation
-from workflow_engine import build_workflow_plan
+from open_jarvis.audio.tts_provider import build_tts_provider_options, select_tts_provider
+from open_jarvis.audio.voice_calibration import build_calibration_recommendation
+from open_jarvis.commands.command_history import CommandHistory
+from open_jarvis.commands.command_suggestions import suggest_commands
+from open_jarvis.commands.error_messages import build_user_error
+from open_jarvis.evaluation.eval_artifacts import build_eval_artifact, compare_eval_artifacts, write_eval_artifacts
+from open_jarvis.evaluation.eval_measurements import run_measured_eval_suite
+from open_jarvis.evaluation.eval_runner import run_eval_suite
+from open_jarvis.evaluation.evaluation_suite import build_eval_suite, summarize_eval_results
+from open_jarvis.evaluation.performance_benchmarks import build_performance_budget, summarize_benchmark_results
+from open_jarvis.health.feature_quality import build_feature_catalog, build_feature_quality_report, render_feature_quality_report
+from open_jarvis.integrations.llm_fallback import build_provider_result, resolve_ai_mode, select_llm_provider
+from open_jarvis.integrations.model_installer import (
+    build_model_install_plan,
+    build_signed_model_catalog,
+    verify_model_catalog,
+    verify_model_checksum,
+)
+from open_jarvis.integrations.model_installer import main as model_installer_main
+from open_jarvis.integrations.offline_profile import build_offline_profile
+from open_jarvis.memory.privacy_mode import build_privacy_session, mask_sensitive_text, mask_sensitive_value
+from open_jarvis.memory.user_profiles import build_user_profile, merge_user_profile
+from open_jarvis.plugins.permission_profiles import action_allowed, build_permission_matrix, get_active_permission_profile
+from open_jarvis.release.maintenance import build_maintenance_plan
+from open_jarvis.release.release_build import build_release_artifacts, build_windows_release_plan, compute_file_sha256
+from open_jarvis.release.release_build import main as release_build_main
+from open_jarvis.runtime.e2e_readiness import build_e2e_readiness_plan
+from open_jarvis.runtime.onboarding_engine import build_onboarding_result
+from open_jarvis.runtime.workflow_engine import build_workflow_plan
+from open_jarvis.security.release_security import build_key_rotation_plan, build_release_manifest, validate_release_environment
+from open_jarvis.ui.memory_panel import build_memory_panel, delete_note, update_preference
+from open_jarvis.ui.release_panel import build_release_panel
+from open_jarvis.ui.security_center import build_security_overview
 
 
 class ProductFeaturesTest(TestCase):
@@ -426,7 +431,7 @@ class ProductFeaturesTest(TestCase):
         self.assertTrue(any(item["measurement_source"] == "stt_fixture" for item in result["results"]))
 
     def test_eval_runner_cli_can_write_measured_artifacts(self):
-        from eval_runner import main as eval_runner_main
+        from open_jarvis.evaluation.eval_runner import main as eval_runner_main
 
         with TemporaryDirectory() as tmp:
             exit_code = eval_runner_main(

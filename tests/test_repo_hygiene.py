@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from repo_hygiene import clean_hygiene_items, find_hygiene_items, find_secret_patterns, render_hygiene_report
+from open_jarvis.release.repo_hygiene import clean_hygiene_items, find_hygiene_items, find_secret_patterns, render_hygiene_report
 
 
 class RepoHygieneTests(unittest.TestCase):

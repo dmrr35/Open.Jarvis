@@ -128,12 +128,12 @@ class ProjectQualityFilesTests(unittest.TestCase):
 
     def test_public_ui_text_is_english_and_not_mojibake(self):
         files = [
-            Path("arayuz.py"),
-            Path("ui_onboarding.py"),
-            Path("ui_dialogs.py"),
-            Path("jarvis_admin.py"),
-            Path("jarvis_admin_config.py"),
-            Path("haftalik_guncelleme.py"),
+            Path("open_jarvis/ui/arayuz.py"),
+            Path("open_jarvis/ui/ui_onboarding.py"),
+            Path("open_jarvis/ui/ui_dialogs.py"),
+            Path("open_jarvis/security/jarvis_admin.py"),
+            Path("open_jarvis/security/jarvis_admin_config.py"),
+            Path("open_jarvis/evaluation/haftalik_guncelleme.py"),
             Path("README.md"),
         ]
         forbidden = [chr(0xC3), chr(0xC4), chr(0xC5), chr(0xFFFD), "Neden:", "Yapman gereken"]
@@ -144,7 +144,7 @@ class ProjectQualityFilesTests(unittest.TestCase):
                 self.assertNotIn(token, content, f"{token!r} found in {file_path}")
 
     def test_ui_theme_exposes_professional_design_tokens(self):
-        from ui_theme import build_design_tokens
+        from open_jarvis.ui.ui_theme import build_design_tokens
 
         tokens = build_design_tokens()
 
@@ -165,7 +165,7 @@ class ProjectQualityFilesTests(unittest.TestCase):
         self.assertIn("Orbitron", tokens["fonts"]["display"])
 
     def test_assistant_state_profiles_drive_dashboard_behavior(self):
-        from ui_state import ASSISTANT_STATE_ORDER, get_state_profile, infer_state_from_message
+        from open_jarvis.ui.ui_state import ASSISTANT_STATE_ORDER, get_state_profile, infer_state_from_message
 
         expected_states = ["BOOTING", "STANDBY", "LISTENING", "PROCESSING", "EXECUTING", "SPEAKING", "ERROR", "OFFLINE"]
         self.assertEqual(list(ASSISTANT_STATE_ORDER), expected_states)
@@ -187,7 +187,7 @@ class ProjectQualityFilesTests(unittest.TestCase):
         self.assertEqual(infer_state_from_message("ERROR microphone not detected"), "ERROR")
 
     def test_log_events_use_professional_terminal_prefixes(self):
-        from ui_log_events import EVENT_PREFIXES, infer_log_kind, normalize_log_event
+        from open_jarvis.ui.ui_log_events import EVENT_PREFIXES, infer_log_kind, normalize_log_event
 
         self.assertEqual(EVENT_PREFIXES["info"], "[INFO]")
         self.assertEqual(EVENT_PREFIXES["voice"], "[VOICE]")
@@ -206,7 +206,7 @@ class ProjectQualityFilesTests(unittest.TestCase):
         self.assertEqual(infer_log_kind("ERROR microphone not detected"), "error")
 
     def test_ui_smoke_builds_main_window_without_runtime_thread(self):
-        from ui_smoke import run_ui_smoke
+        from open_jarvis.ui.ui_smoke import run_ui_smoke
 
         result = run_ui_smoke()
 
@@ -215,7 +215,7 @@ class ProjectQualityFilesTests(unittest.TestCase):
         self.assertGreaterEqual(result["widgets"], 1)
 
     def test_hologram_layout_has_ring_arcs_spokes_and_particles(self):
-        from ui_rendering import build_hologram_layout
+        from open_jarvis.ui.ui_rendering import build_hologram_layout
 
         layout = build_hologram_layout(520, 330, angle=15)
 
@@ -229,7 +229,7 @@ class ProjectQualityFilesTests(unittest.TestCase):
         self.assertGreaterEqual(len(layout["particles"]), 32)
 
     def test_hologram_labels_stay_inside_canvas(self):
-        from ui_rendering import build_hologram_layout
+        from open_jarvis.ui.ui_rendering import build_hologram_layout
 
         width = 520
         height = 330
@@ -248,7 +248,7 @@ class ProjectQualityFilesTests(unittest.TestCase):
         self.assertGreater(layout["labels"]["bottom"][1], cy + outer_ring)
 
     def test_main_ui_keeps_assistant_status_without_control_clutter(self):
-        content = Path("arayuz.py").read_text(encoding="utf-8")
+        content = Path("open_jarvis/ui/arayuz.py").read_text(encoding="utf-8")
 
         self.assertIn("STANDBY - SAY JARVIS", content)
         self.assertIn('"GPU"', content)
@@ -284,7 +284,7 @@ class ProjectQualityFilesTests(unittest.TestCase):
             self.assertNotIn(removed_button, content)
 
     def test_sidebar_pages_define_phase_three_navigation(self):
-        from ui_pages import PAGE_ITEMS, PAGE_TITLES, _build_page_values
+        from open_jarvis.ui.ui_pages import PAGE_ITEMS, PAGE_TITLES, _build_page_values
 
         expected_pages = ["dashboard", "system", "modules", "integrations", "security", "settings"]
         self.assertEqual(list(PAGE_TITLES), expected_pages)
@@ -296,10 +296,10 @@ class ProjectQualityFilesTests(unittest.TestCase):
         self.assertIn("CPU usage", _build_page_values("system"))
         self.assertIn("Groq provider", _build_page_values("integrations"))
         self.assertIn("Permission profile", _build_page_values("security"))
-        self.assertNotIn("READY FOR PHASE 4 DATA BINDING", Path("ui_pages.py").read_text(encoding="utf-8"))
+        self.assertNotIn("READY FOR PHASE 4 DATA BINDING", Path("open_jarvis/ui/ui_pages.py").read_text(encoding="utf-8"))
 
     def test_ui_screenshot_regression_defines_visual_quality_gate(self):
-        content = Path("ui_screenshot_regression.py").read_text(encoding="utf-8")
+        content = Path("open_jarvis/ui/ui_screenshot_regression.py").read_text(encoding="utf-8")
 
         self.assertIn("run_screenshot_regression", content)
         self.assertIn("validate_metrics", content)

@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-import jarvis_runtime
-from runtime import timer as timer_runtime
+import open_jarvis.runtime.jarvis_runtime as jarvis_runtime
+from open_jarvis.runtime import timer as timer_runtime
 
 
 class JarvisRuntimeTest(unittest.TestCase):
@@ -12,7 +12,7 @@ class JarvisRuntimeTest(unittest.TestCase):
     def test_handle_timer_command_starts_timer(self):
         spoken = []
 
-        with patch("jarvis_runtime.speak", side_effect=spoken.append), patch("runtime.timer.start_timer") as start_timer_mock:
+        with patch("open_jarvis.runtime.jarvis_runtime.speak", side_effect=spoken.append), patch("open_jarvis.runtime.timer.start_timer") as start_timer_mock:
             result = jarvis_runtime.handle_timer_command("set a timer for 10 minutes")
 
         self.assertTrue(result)

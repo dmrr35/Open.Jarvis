@@ -1,7 +1,7 @@
 import unittest
 from urllib.error import URLError
 
-from provider_health import build_provider_health_checks, probe_local_llm
+from open_jarvis.integrations.provider_health import build_provider_health_checks, probe_local_llm
 
 
 class ProviderHealthTests(unittest.TestCase):

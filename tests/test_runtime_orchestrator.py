@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from runtime.orchestrator import handle_runtime_command, should_return_to_standby
+from open_jarvis.runtime.orchestrator import handle_runtime_command, should_return_to_standby
 
 
 class DummyWakeState:
@@ -63,9 +63,9 @@ class RuntimeOrchestratorTest(unittest.TestCase):
         maybe_tell_joke.assert_not_called()
 
     def test_should_return_to_standby_respects_timeout(self):
-        with patch("runtime.orchestrator.time.time", return_value=12.0):
+        with patch("open_jarvis.runtime.orchestrator.time.time", return_value=12.0):
             self.assertFalse(should_return_to_standby(10.0, 5))
-        with patch("runtime.orchestrator.time.time", return_value=1.0):
+        with patch("open_jarvis.runtime.orchestrator.time.time", return_value=1.0):
             self.assertTrue(should_return_to_standby(0.0, 0))
 
 

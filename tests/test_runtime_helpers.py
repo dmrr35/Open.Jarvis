@@ -1,14 +1,14 @@
 import unittest
 from unittest.mock import patch
 
-from memory import build_memory_health_report, get_memory_quality_score, prune_memory
-from observability import build_runtime_event_snapshot, format_runtime_event, read_runtime_events
-from plugin_security import (
+from open_jarvis.health.observability import build_runtime_event_snapshot, format_runtime_event, read_runtime_events
+from open_jarvis.memory import build_memory_health_report, get_memory_quality_score, prune_memory
+from open_jarvis.plugins.plugin_security import (
     build_plugin_sandbox_policy,
     validate_plugin_manifest,
 )
-from process_runner import launch_process
-from release_security import (
+from open_jarvis.runtime.process_runner import launch_process
+from open_jarvis.security.release_security import (
     build_release_smoke_check,
     sign_release_payload,
     verify_release_signature,
@@ -20,7 +20,7 @@ class RuntimeHelpersTest(unittest.TestCase):
         with self.assertRaises(TypeError):
             launch_process("notepad.exe")
 
-    @patch("process_runner.subprocess.Popen")
+    @patch("open_jarvis.runtime.process_runner.subprocess.Popen")
     def test_launch_process_uses_shellless_sequence(self, popen_mock):
         launch_process(["notepad.exe"])
 
@@ -198,7 +198,7 @@ class RuntimeHelpersTest(unittest.TestCase):
                 '{"timestamp": "2026-04-14T10:00:00", "severity": "info"}\nnot-json\n',
                 encoding="utf-8",
             )
-            with patch("observability.EVENT_LOG", event_file):
+            with patch("open_jarvis.health.observability.EVENT_LOG", event_file):
                 events = read_runtime_events()
 
         self.assertEqual(len(events), 1)
@@ -221,13 +221,13 @@ class RuntimeHelpersTest(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
-            with patch("observability.EVENT_LOG", event_file):
+            with patch("open_jarvis.health.observability.EVENT_LOG", event_file):
                 events = read_runtime_events(limit=2)
 
         self.assertEqual([event["event_type"] for event in events], ["middle", "new"])
 
-    @patch("observability.read_runtime_events")
-    @patch("observability.build_slo_report")
+    @patch("open_jarvis.health.observability.read_runtime_events")
+    @patch("open_jarvis.health.observability.build_slo_report")
     def test_build_runtime_event_snapshot_orders_newest_first(self, build_slo_report_mock, read_runtime_events_mock):
         read_runtime_events_mock.return_value = [
             {"timestamp": "2026-04-14T10:00:00", "severity": "info", "event_type": "startup", "detail": "started", "context": {}},
@@ -247,8 +247,8 @@ class RuntimeHelpersTest(unittest.TestCase):
         self.assertTrue(snapshot["formatted_events"][0].startswith("[ERROR]"))
         self.assertTrue(snapshot["formatted_events"][1].startswith("[INFO]"))
 
-    @patch("observability.read_runtime_events")
-    @patch("observability.build_slo_report")
+    @patch("open_jarvis.health.observability.read_runtime_events")
+    @patch("open_jarvis.health.observability.build_slo_report")
     def test_build_runtime_event_snapshot_filters_by_severity(self, build_slo_report_mock, read_runtime_events_mock):
         read_runtime_events_mock.return_value = [
             {"timestamp": "2026-04-14T10:00:00", "severity": "info", "event_type": "startup", "detail": "started", "context": {}},

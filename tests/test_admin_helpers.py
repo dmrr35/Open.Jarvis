@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from jarvis_admin import (
+from open_jarvis.security.jarvis_admin import (
     build_health_checks,
     build_known_limitations,
     build_onboarding_steps,
