@@ -43,7 +43,7 @@ jobs:
       - name: Release signing smoke test
         env:
           JARVIS_RELEASE_SIGNING_KEY: ${{ secrets.JARVIS_RELEASE_SIGNING_KEY || 'ci-local-signing-key-for-smoke-tests' }}
-        run: python -c "from release_security import build_release_smoke_check; check = build_release_smoke_check('ci', {'path':'dist/JARVIS.exe','sha256':'smoke'}); assert check['verification']['valid']"
+        run: python -c "from open_jarvis.security.release_security import build_release_smoke_check; check = build_release_smoke_check('ci', {'path':'dist/JARVIS.exe','sha256':'smoke'}); assert check['verification']['valid']"
 
       - name: Build Windows release artifact
         run: pyinstaller --noconfirm --onefile --windowed --name JARVIS arayuz.py
