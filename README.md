@@ -698,4 +698,4 @@ Open.Jarvis is strongest in free-first desktop automation, local command routing
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE).
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
