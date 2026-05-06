@@ -9,6 +9,8 @@ Open.Jarvis can listen to voice commands, open applications, control the desktop
 - Destructive runtime actions are blocked unless `JARVIS_ALLOW_DESTRUCTIVE_ACTIONS=true`.
 - Browser navigation is limited to `http` and `https` URLs.
 - Plugin manifests must keep entrypoints inside the plugin directory.
+- Plugin discovery must not execute plugin code.
+- Plugin permissions are deny-by-default for unknown, high-risk, and critical capabilities.
 - Privacy mode can disable memory writes and mask secret-like values.
 - Release signing uses trusted signers and a signing key policy.
 - Health checks surface missing credentials before normal runtime use.
@@ -21,6 +23,7 @@ Open.Jarvis can listen to voice commands, open applications, control the desktop
 - Run `python repo_hygiene.py --include-secrets` before publishing.
 - Run `python repo_hygiene.py --clean` to remove generated artifacts; add `--include-secrets` only after backing up or rotating local keys.
 - Do not paste API keys, OAuth tokens, Spotify secrets, plugin signing keys, release signing keys, runtime logs, or JSONL event streams into issues.
+- Do not paste private plugin manifests if they contain local paths, internal package names, or signing metadata.
 - Logs and UI messages should mask secret-like values instead of printing raw credentials.
 
 ## Report a vulnerability
@@ -45,6 +48,7 @@ This project is pre-release. Treat the current main workspace as the only suppor
 - Run `python project_audit.py`.
 - Never commit `.env`, API keys, tokens, generated secrets, or local user data.
 - Prefer allowlists over blocklists for commands, plugins, and URLs.
+- Add negative tests for plugin permissions, broken plugin hooks, and invalid manifests.
 
 ## Out of scope
 

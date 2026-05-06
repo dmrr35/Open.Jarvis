@@ -34,6 +34,9 @@ def build_plugin_marketplace_text(root: Path | str = "plugins") -> str:
         lines.append(f"[{plugin['trust_status'].upper()}] {plugin['name']} {plugin['version']}")
         lines.append(f"  Signature: {plugin.get('signature_status', 'unknown')}")
         lines.append(f"  Sandbox: {plugin.get('sandbox_status', 'unknown')}")
+        lines.append(f"  Risk: {plugin.get('risk', 'low')}")
+        if plugin.get("permissions"):
+            lines.append(f"  Permissions: {', '.join(plugin['permissions'])}")
         lines.append(f"  Enabled: {'yes' if plugin.get('enabled') else 'no'}")
         action = plugin.get("approval_action", {})
         if action:

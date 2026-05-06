@@ -35,6 +35,8 @@ The format follows Keep a Changelog, and this project uses semantic versioning o
 - Added public release readiness reporting for docs, local hygiene, quality gates, and signing readiness.
 - Added repository hygiene and public release commands for GitHub publication preparation.
 - Added recursive hygiene scanning for generated artifacts, bytecode, archives, runtime event streams, and suspicious non-placeholder secret assignments.
+- Added v0.3.0 local plugin manifest validation, plugin permission registry, safe plugin context, registry, loader, lifecycle hooks, and failure-isolation tests.
+- Added plugin developer documentation for manifests, permissions, lifecycle hooks, and safe local testing.
 
 ### Changed
 
@@ -63,8 +65,11 @@ The format follows Keep a Changelog, and this project uses semantic versioning o
 - Treated release signing as optional for public source releases while keeping signing checks visible for executable and model artifact releases.
 - Documented source release exclusions and pytest-compatible test execution.
 - Reduced optional integration traceback noise for Groq, Spotify, microphone input, and TTS audio fallback paths.
+- Improved plugin marketplace metadata with plugin IDs, permission summaries, risk levels, and manifest compatibility warnings.
+- Preserved legacy plugin manifest compatibility while guiding new plugins toward stable `id` and explicit `permissions` fields.
 
 ### Verified
 
 - Product feature coverage now runs through focused startup/workflow, command/provider, security/memory, release/eval, audio/offline, and quality/maintenance test modules.
+- Plugin coverage now includes manifest validation, permission boundaries, safe context behavior, registry discovery, loader isolation, lifecycle hooks, and security-boundary tests.
 - Unit tests, Ruff linting, project audit, health check, and feature quality checks are used as the current quality gate.

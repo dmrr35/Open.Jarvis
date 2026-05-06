@@ -6,6 +6,8 @@ import json
 from json import JSONDecodeError
 from pathlib import Path
 
+from open_jarvis.plugins.manifest import validate_plugin_manifest_schema
+
 TRUST_POLICY_FILE = Path(__file__).resolve().parent / "jarvis_plugin_trust.json"
 DEFAULT_SANDBOX_POLICY = {
     "execution": "isolated",
@@ -46,12 +48,18 @@ def build_plugin_sandbox_policy() -> dict:
 
 
 def validate_plugin_manifest(manifest: dict, trusted_signers: list[str] | None = None) -> dict:
-    """Validate a plugin manifest and report trust issues."""
+    """Validate a plugin manifest and report trust issues.
+
+    This keeps the legacy public API while delegating v0.3.0 manifest and
+    permission checks to the normalized schema validator.
+    """
 
     trust_policy = load_plugin_trust_policy()
     trusted_signers = trusted_signers or trust_policy.get("trusted_signers", ["ci"])
-    issues: list[str] = []
     policy = build_plugin_sandbox_policy()
+    schema = validate_plugin_manifest_schema(manifest, allow_legacy=True)
+    issues: list[str] = list(schema["issues"])
+    warnings: list[str] = list(schema["warnings"])
 
     missing = sorted(REQUIRED_MANIFEST_KEYS - set(manifest))
     if missing:
@@ -85,8 +93,13 @@ def validate_plugin_manifest(manifest: dict, trusted_signers: list[str] | None =
     return {
         "valid": valid,
         "issues": issues,
+        "warnings": warnings,
         "policy": policy,
-        "manifest": dict(manifest),
+        "manifest": dict(schema["manifest"]),
+        "id": schema["id"],
+        "permissions": list(schema["permissions"]),
+        "risk": schema["risk"],
+        "legacy": schema["legacy"],
         "trust_policy": trust_policy,
     }
 

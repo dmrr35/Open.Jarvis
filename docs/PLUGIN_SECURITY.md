@@ -4,11 +4,26 @@ Plugins are treated as untrusted by default.
 
 ## Trust Model
 
-- Require a manifest with `name`, `version`, `entrypoint`, and `signer`.
+- New v0.3.0 plugins should use a manifest with `id`, `name`, `version`, `entrypoint`, and `permissions`.
+- Legacy manifests with `name`, `version`, `entrypoint`, and `signer` are still supported with compatibility warnings.
 - Accept only trusted signers.
 - Verify the manifest signature before marketplace trust or enablement.
 - Reject entrypoints that escape the plugin directory.
 - Build execution through `plugin_runner.py` instead of importing plugin code directly.
+- Discovery and registry listing must not execute plugin code.
+
+## Permission Model
+
+Plugin permissions are separate from runtime command permission profiles. Unknown permissions are blocked. High-risk and critical permissions are denied by default unless an explicit local approval policy allows them.
+
+Examples:
+
+- Low risk: `commands.register`, `ui.notify`
+- Medium risk: `memory.read`, `memory.write`, `audio.play`, `spotify.control`, `groq.request`
+- High risk: `commands.execute`, `network.request`, `filesystem.read`
+- Critical: `filesystem.write`, `desktop.automation`, `process.spawn`
+
+Signing a plugin does not grant permissions. Enabling a plugin does not bypass destructive-action safety gates.
 
 ## Sandbox Policy
 
@@ -37,6 +52,12 @@ Use `plugin_runner.run_plugin_in_sandbox(...)` for trusted plugins that should a
 
 The marketplace exposes sandbox readiness and approval action metadata so users can see whether a plugin is safe to enable before any execution path is used.
 
+## Lifecycle and Context
+
+The optional loader supports `on_load`, `on_enable`, `on_disable`, `on_command`, and `on_shutdown` hooks. Hook failures are isolated and reported as plugin failures instead of crashing the assistant.
+
+Plugins receive a `PluginContext` facade. The context does not expose raw environment variables, API keys, provider clients, subprocess access, arbitrary filesystem access, or UI internals. Privileged context APIs require matching permissions.
+
 ## Signature Verification
 
 Use `plugin_signature.sign_plugin_manifest(...)` to sign local manifests and `plugin_signature.verify_plugin_signature(...)` to verify them. Local plugin signatures use deterministic JSON plus HMAC-SHA256.
@@ -54,4 +75,4 @@ Use `plugin_state.enable_plugin(...)` and `plugin_state.disable_plugin(...)` to 
 
 ## Validation
 
-Use `plugin_security.validate_plugin_manifest(...)` before loading a plugin, and keep plugin execution behind explicit user trust decisions.
+Use `plugin_security.validate_plugin_manifest(...)` or the v0.3.0 manifest validator before loading a plugin, and keep plugin execution behind explicit user trust decisions.

@@ -58,6 +58,7 @@ def build_marketplace(
             }
         plugins.append(
             {
+                "id": manifest.get("id", validation.get("id", name)),
                 "name": name,
                 "version": manifest.get("version", "unknown"),
                 "description": manifest.get("description", ""),
@@ -67,6 +68,9 @@ def build_marketplace(
                 "sandbox_status": sandbox_status,
                 "approval_action": approval_action,
                 "enabled": enabled,
+                "permissions": list(validation.get("permissions", [])),
+                "risk": validation.get("risk", "low"),
+                "warnings": list(validation.get("warnings", [])),
                 "issues": issues,
             }
         )

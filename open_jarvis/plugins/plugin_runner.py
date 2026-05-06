@@ -89,6 +89,8 @@ def build_plugin_execution_plan(
         "signature_status": signature["status"],
         "sandbox": sandbox,
         "manifest": dict(manifest),
+        "permissions": list(validation.get("permissions", [])),
+        "risk": validation.get("risk", "low"),
         "execution": {
             "mode": "subprocess",
             "command": [sys.executable, str(resolved)],

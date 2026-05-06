@@ -26,7 +26,7 @@ J.A.R.V.I.S can run in a keyless degraded mode. Local rules, the desktop UI, mem
 - Timers and runtime workflow helpers
 - Privacy mode and secret masking before runtime events are written
 - Permission profiles and destructive-action safety gates
-- Plugin marketplace core, plugin trust state, signature verification, and sandboxed plugin execution helpers
+- Local plugin system with manifests, permissions, trust state, signature verification, lifecycle hooks, and sandboxed execution helpers
 - Offline STT planning with optional Vosk fallback support
 - Health checker, project audit, repository hygiene checker, release readiness checker, eval suite, screenshot regression, and automated tests
 - Release signing helpers, model catalog verification, and source-release hygiene tooling
@@ -68,7 +68,7 @@ Open.Jarvis/
 |   +-- health/             health_center.py, observability.py, feature_quality.py
 |   +-- integrations/       llm_fallback.py, provider_health.py, offline_profile.py, model_installer.py, url_safety.py
 |   +-- memory/             memory_*.py, privacy_mode.py, user_profiles.py, compatibility re-exports
-|   +-- plugins/            permission_profiles.py, plugin_marketplace.py, plugin_runner.py, plugin_security.py, plugin_signature.py, plugin_state.py
+|   +-- plugins/            manifest.py, permissions.py, context.py, registry.py, loader.py, plugin_*.py
 |   +-- release/            repo_hygiene.py, project_audit.py, release_build.py, maintenance.py
 |   +-- runtime/            jarvis_runtime.py, wake word, command listener, timer, orchestration, UI bridge, personality
 |   +-- security/           jarvis_admin.py, release_security.py, public_release.py, security policy helpers
@@ -491,7 +491,7 @@ Expected warnings in a fresh keyless setup:
 | Health center | Implemented | `health_center.py`, `kontrol.py`, `ui_dialogs.py` | Add setup validation repair coverage |
 | Runtime observability | Implemented | `observability.py`, `runtime/ui_bridge.py` | Add structured dashboards and log rotation |
 | Live UI state bridge | Implemented | `runtime/ui_bridge.py`, `ui_state.py`, `komutlar.py`, `ses_motoru.py` | Add richer per-module state transitions |
-| Plugin security | Implemented core | `plugin_security.py`, `plugin_signature.py`, `plugin_state.py`, `plugin_runner.py` | Add stronger OS-level isolation |
+| Plugin security | Implemented core | `manifest.py`, `permissions.py`, `context.py`, `registry.py`, `loader.py`, `plugin_runner.py` | Add stronger OS-level isolation |
 | Plugin marketplace UI | Implemented core | `plugin_marketplace.py`, `ui_plugin_marketplace.py` | Add remote signed catalog support |
 | Eval suite | Implemented | `evaluation_suite.py`, `eval_runner.py`, `eval_measurements.py` | Add more real voice and safety fixtures |
 | Release artifacts | Implemented | `release_build.py`, `release_security.py` | Add installer packaging and release notes |
@@ -515,7 +515,7 @@ These modules are intentionally small, testable, and reusable from the desktop a
 | Memory panel data | `memory_panel.py` | User-visible memory snapshot, preference update, and note deletion |
 | Security overview | `security_center.py` | Permission profile, privacy mode, masked secret status, and confirmation-required action summary |
 | Command history and undo | `command_history.py` | Recent command list with optional undo callbacks |
-| Plugin marketplace | `plugin_marketplace.py` | Local plugin manifest scan, trust status, signature status, and enablement state |
+| Plugin marketplace | `plugin_marketplace.py` | Local plugin manifest scan, trust status, permission risk, signature status, and enablement state |
 | Local LLM fallback | `llm_fallback.py` | AI mode, provider selection, provider result shape, and offline/rules fallback |
 | Workflow mode | `workflow_engine.py` | Multi-step task plans with rollback notes |
 | Health center | `health_center.py` | Prioritized health cards, fix commands, safe dry-run/apply repairs, and repair audit events |
@@ -671,6 +671,7 @@ Open.Jarvis is strongest in free-first desktop automation, local command routing
 - Logs are written to `logs/jarvis.log`.
 - Runtime events are written to `logs/runtime_events.jsonl`.
 - Offline STT details live in `docs/OFFLINE_STT.md`.
+- Plugin development details live in `docs/PLUGIN_DEVELOPMENT.md`.
 - Plugin security details live in `docs/PLUGIN_SECURITY.md`.
 - Release signing details live in `docs/RELEASE_SIGNING.md`.
 
