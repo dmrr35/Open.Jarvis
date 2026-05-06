@@ -1,3 +1,4 @@
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -55,6 +56,28 @@ class PublicReleaseCheckTests(unittest.TestCase):
 
             self.assertTrue(findings)
             self.assertTrue(any("machine-specific Windows user path" in finding.reason for finding in findings))
+
+    def test_deleted_tracked_files_do_not_crash_scan(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            stale_file = root / "stale.txt"
+            stale_file.write_text("safe text", encoding="utf-8")
+            subprocess.run(["git", "init"], cwd=root, check=True, capture_output=True)
+            subprocess.run(["git", "add", "stale.txt"], cwd=root, check=True, capture_output=True)
+            stale_file.unlink()
+
+            self.assertEqual(run_check(root), [])
+
+    def test_untracked_public_files_are_scanned(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            subprocess.run(["git", "init"], cwd=root, check=True, capture_output=True)
+            (root / "config.txt").write_text("GROQ_API_KEY=gsk_" + ("a" * 32), encoding="utf-8")
+
+            findings = run_check(root)
+
+            self.assertTrue(findings)
+            self.assertTrue(any("Groq API key pattern" in finding.reason for finding in findings))
 
 
 if __name__ == "__main__":

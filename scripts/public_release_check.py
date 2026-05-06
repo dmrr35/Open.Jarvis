@@ -127,7 +127,7 @@ def _relative(path: Path, root: Path) -> Path:
 def _git_tracked_files(root: Path) -> list[Path] | None:
     try:
         result = subprocess.run(
-            ["git", "ls-files"],
+            ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
             cwd=root,
             check=True,
             capture_output=True,
@@ -150,11 +150,13 @@ def _walk_files(root: Path) -> list[Path]:
 
 
 def iter_public_files(root: Path = ROOT) -> list[Path]:
-    """Return tracked files when possible, otherwise a source-tree approximation."""
+    """Return public candidate files when possible, otherwise a source-tree approximation."""
 
     files = _git_tracked_files(root) or _walk_files(root)
     public_files: list[Path] = []
     for path in files:
+        if not path.exists():
+            continue
         rel = _relative(path, root)
         if any(part in SKIP_DIRS for part in rel.parts):
             continue

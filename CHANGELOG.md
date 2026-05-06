@@ -38,6 +38,7 @@ The format follows Keep a Changelog, and this project uses semantic versioning o
 
 ### Changed
 
+- Split the monolithic product feature test suite into smaller domain-focused files for easier CI triage and maintenance.
 - Updated README status and license information for GitHub publication.
 - Cleaned repository ignore rules into plain English.
 - Expanded environment template comments around free-first and optional integrations.
@@ -65,4 +66,5 @@ The format follows Keep a Changelog, and this project uses semantic versioning o
 
 ### Verified
 
+- Product feature coverage now runs through focused startup/workflow, command/provider, security/memory, release/eval, audio/offline, and quality/maintenance test modules.
 - Unit tests, Ruff linting, project audit, health check, and feature quality checks are used as the current quality gate.
