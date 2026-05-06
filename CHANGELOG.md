@@ -37,6 +37,8 @@ The format follows Keep a Changelog, and this project uses semantic versioning o
 - Added recursive hygiene scanning for generated artifacts, bytecode, archives, runtime event streams, and suspicious non-placeholder secret assignments.
 - Added v0.3.0 local plugin manifest validation, plugin permission registry, safe plugin context, registry, loader, lifecycle hooks, and failure-isolation tests.
 - Added plugin developer documentation for manifests, permissions, lifecycle hooks, and safe local testing.
+- Added v0.4.0 voice UX foundations: explicit voice state machine, safer wake-word matching, microphone diagnostics, push-to-talk fallback, TTS queue, and injected voice controller tests.
+- Added voice setup and troubleshooting documentation for optional wake-word, push-to-talk, microphone, TTS, and offline STT behavior.
 
 ### Changed
 
@@ -67,9 +69,12 @@ The format follows Keep a Changelog, and this project uses semantic versioning o
 - Reduced optional integration traceback noise for Groq, Spotify, microphone input, and TTS audio fallback paths.
 - Improved plugin marketplace metadata with plugin IDs, permission summaries, risk levels, and manifest compatibility warnings.
 - Preserved legacy plugin manifest compatibility while guiding new plugins toward stable `id` and explicit `permissions` fields.
+- Hardened wake-word listener matching to use normalized whole-token detection and wake-word disabled mode.
+- Expanded `.env.example` with optional voice, wake-word, push-to-talk, and TTS flags.
 
 ### Verified
 
 - Product feature coverage now runs through focused startup/workflow, command/provider, security/memory, release/eval, audio/offline, and quality/maintenance test modules.
 - Plugin coverage now includes manifest validation, permission boundaries, safe context behavior, registry discovery, loader isolation, lifecycle hooks, and security-boundary tests.
+- Voice coverage now uses mocked microphone, wake-word, push-to-talk, TTS, and controller flows without requiring real audio hardware.
 - Unit tests, Ruff linting, project audit, health check, and feature quality checks are used as the current quality gate.

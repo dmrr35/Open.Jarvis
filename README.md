@@ -61,7 +61,7 @@ Open.Jarvis/
 +-- evals/                  Evaluation support area
 +-- open_jarvis/            Main source package
 |   +-- app/                Package entry point for terminal mode
-|   +-- audio/              ses_motoru.py, speech_backend.py, tts_provider.py, voice_calibration.py
+|   +-- audio/              voice state, wake word, push-to-talk, microphone diagnostics, TTS queue, STT/TTS helpers
 |   +-- commands/           komutlar.py, local router, Groq router, action schema, dispatcher
 |   |   `-- domains/        Runtime, media, and memory action handlers
 |   +-- evaluation/         evaluation_suite.py, eval_runner.py, eval_artifacts.py, eval_measurements.py, performance_benchmarks.py
@@ -106,8 +106,8 @@ Requirements:
 
 - Windows 10 or 11
 - Python 3.11+
-- A working microphone for voice input
-- Speakers or an audio output device for voice responses
+- Optional: a working microphone for voice input
+- Optional: speakers or an audio output device for voice responses
 
 Recommended install:
 
@@ -294,7 +294,7 @@ python -m ruff check .
 
 ### Activation
 
-Say `Jarvis` to wake the assistant. After the command completes, it returns to standby mode.
+Say `Jarvis` to wake the assistant. After the command completes, it returns to standby mode. Voice is optional: if wake-word mode or the microphone is unavailable, the UI and text/local command paths remain usable. Push-to-talk is the intended fallback path for systems where always-listening wake-word mode is disabled.
 
 ### Applications
 
@@ -632,7 +632,11 @@ Open.Jarvis is strongest in free-first desktop automation, local command routing
 | `JARVIS_AI_MODE` | AI routing mode: `auto`, `free_cloud`, `offline`, or `rules` | `auto` |
 | `JARVIS_ENABLE_GROQ` | Explicitly enable optional Groq cloud routing | `false` in `.env.example` |
 | `JARVIS_GROQ_MODEL` | Groq model used for routing and summarization | `llama-3.1-8b-instant` |
+| `JARVIS_VOICE_ENABLED` | Enable optional voice UX controller behavior | `true` |
 | `JARVIS_WAKE_WORD` | Wake word used to activate the assistant | `jarvis` |
+| `JARVIS_WAKE_WORD_ENABLED` | Enable always-listening wake-word mode when voice is available | `true` |
+| `JARVIS_WAKE_WORD_COOLDOWN_SECONDS` | Minimum seconds between wake-word detections | `1.0` |
+| `JARVIS_PUSH_TO_TALK_ENABLED` | Keep push-to-talk fallback available when supported by UI/runtime callers | `true` |
 | `JARVIS_ACTIVE_TIMEOUT` | Seconds before returning to standby | `60` |
 | `JARVIS_ACTION_SEQUENCE_DELAY` | Delay between multi-action workflow steps | `0.1` |
 | `JARVIS_APP_LAUNCH_DELAY` | Short pause after launching apps | `0.2` |
@@ -642,6 +646,7 @@ Open.Jarvis is strongest in free-first desktop automation, local command routing
 | `JARVIS_TYPE_DELAY` | Delay before automatic typing starts | `0.1` |
 | `JARVIS_ENERGY_THRESHOLD` | Microphone sensitivity | `300` |
 | `JARVIS_PAUSE_THRESHOLD` | Pause length for command segmentation | `1.0` |
+| `JARVIS_TTS_ENABLED` | Enable optional spoken responses | `true` |
 | `JARVIS_TTS_PROVIDER` | Voice output provider selector | `edge` |
 | `JARVIS_ALLOW_DESTRUCTIVE_ACTIONS` | Permit shutdown, restart, sleep, and lock actions | `false` |
 | `JARVIS_PERMISSION_PROFILE` | Permission profile for runtime actions | `normal` |
