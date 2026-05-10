@@ -31,6 +31,13 @@ jobs:
       - name: Test
         run: python -m unittest discover -s tests -q
 
+      - name: Windows portable packaging dry run
+        run: |
+          python scripts/build_windows_portable.py --help
+          python scripts/build_windows_portable.py --version ci --dry-run
+          python scripts/verify_release_artifact.py --help
+          python -m pytest tests/release
+
       - name: Eval artifact report
         run: python eval_runner.py --measured --write-artifacts --release-version ci --output-dir exports
 

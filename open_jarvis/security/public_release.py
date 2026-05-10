@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import os
 import subprocess
 import sys
@@ -188,10 +189,12 @@ def render_public_release_check(report: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Render Open.Jarvis public release readiness.")
+    parser.parse_args(argv)
     print(render_public_release_check(build_public_release_check()))
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv[1:]))

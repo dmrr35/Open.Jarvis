@@ -16,6 +16,7 @@ CENTRAL_PROCESS_WRAPPERS = {
     "public_release.py",
     "scripts/public_release_check.py",
     "open_jarvis/runtime/process_runner.py",
+    "open_jarvis/release/windows_portable.py",
     "open_jarvis/security/public_release.py",
 }
 REQUIRED_OSS_FILES = {

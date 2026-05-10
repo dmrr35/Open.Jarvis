@@ -98,6 +98,8 @@ Open.Jarvis/
 
 Generated runtime output such as `logs/`, `exports/`, `memory.json`, caches, build output, and release bundles should not be committed.
 
+Portable Windows packaging is prepared through a dry-run-capable workflow. See `docs/WINDOWS_PORTABLE.md` for user guidance and `docs/BUILD_WINDOWS.md` for build and verification steps. Full installer support is future work; v0.5.0 focuses on safe portable ZIP preparation.
+
 ---
 
 ## Installation
@@ -232,6 +234,18 @@ Health checker:
 
 ```powershell
 python kontrol.py --no-pause
+```
+
+Windows portable build dry-run:
+
+```powershell
+python scripts/build_windows_portable.py --version v0.5.0 --dry-run
+```
+
+Portable artifact verification:
+
+```powershell
+python scripts/verify_release_artifact.py path\to\Open.Jarvis-v0.5.0-windows-portable
 ```
 
 Project audit:

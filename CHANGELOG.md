@@ -39,6 +39,8 @@ The format follows Keep a Changelog, and this project uses semantic versioning o
 - Added plugin developer documentation for manifests, permissions, lifecycle hooks, and safe local testing.
 - Added v0.4.0 voice UX foundations: explicit voice state machine, safer wake-word matching, microphone diagnostics, push-to-talk fallback, TTS queue, and injected voice controller tests.
 - Added voice setup and troubleshooting documentation for optional wake-word, push-to-talk, microphone, TTS, and offline STT behavior.
+- Added v0.5.0 Windows portable package policy, dry-run build workflow, artifact verifier, and release-focused tests.
+- Added Windows portable usage and build documentation with SmartScreen, privacy, and cleanup guidance.
 
 ### Changed
 
@@ -71,10 +73,12 @@ The format follows Keep a Changelog, and this project uses semantic versioning o
 - Preserved legacy plugin manifest compatibility while guiding new plugins toward stable `id` and explicit `permissions` fields.
 - Hardened wake-word listener matching to use normalized whole-token detection and wake-word disabled mode.
 - Expanded `.env.example` with optional voice, wake-word, push-to-talk, and TTS flags.
+- Kept portable packaging additive to the source workflow and documented full installer support as future work.
 
 ### Verified
 
 - Product feature coverage now runs through focused startup/workflow, command/provider, security/memory, release/eval, audio/offline, and quality/maintenance test modules.
 - Plugin coverage now includes manifest validation, permission boundaries, safe context behavior, registry discovery, loader isolation, lifecycle hooks, and security-boundary tests.
 - Voice coverage now uses mocked microphone, wake-word, push-to-talk, TTS, and controller flows without requiring real audio hardware.
+- Portable release coverage now verifies artifact layout, dry-run behavior, include rules, private-data exclusions, folder checks, and ZIP traversal rejection without running PyInstaller.
 - Unit tests, Ruff linting, project audit, health check, and feature quality checks are used as the current quality gate.
