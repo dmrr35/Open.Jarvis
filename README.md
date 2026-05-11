@@ -641,6 +641,19 @@ Open.Jarvis is strongest in free-first desktop automation, local command routing
 
 ## Settings Reference
 
+Open.Jarvis v0.6.0 adds a central configuration manager for non-secret preferences. Existing `.env` and environment variables remain supported for compatibility, especially for optional integration secrets.
+
+Configuration precedence is:
+
+1. built-in safe defaults
+2. environment variables and legacy `.env` values
+3. user-local `settings.json` for non-secret settings
+4. explicit Settings UI saves
+
+Source mode stores non-secret settings in the current user's local app data. Portable mode saves non-secret settings to `config/settings.json` in the extracted portable copy. Real `settings.json` files are private user data and must not be committed or shipped in release ZIPs.
+
+Secrets remain environment-only. The Settings UI shows only masked status for API keys, OAuth secrets, tokens, release signing keys, and plugin signing keys. Open.Jarvis does not claim encrypted vault storage or cloud sync.
+
 | Setting | Purpose | Safe default |
 | --- | --- | --- |
 | `JARVIS_AI_MODE` | AI routing mode: `auto`, `free_cloud`, `offline`, or `rules` | `auto` |

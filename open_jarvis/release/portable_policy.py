@@ -74,6 +74,8 @@ def is_denied_portable_path(path: str, *, app_name: str = DEFAULT_APP_NAME) -> d
         return {"denied": True, "reason": "generated or private directory is not allowed"}
     if name_lower == ".env" or (name_lower.endswith(".env") and name_lower != ".env.example"):
         return {"denied": True, "reason": ".env files are not allowed"}
+    if normalized.lower() == "config/settings.json":
+        return {"denied": True, "reason": "real settings.json files are not allowed"}
     if name_lower == "memory.json" or name_lower.startswith("private_memory"):
         return {"denied": True, "reason": "private memory files are not allowed"}
     if suffix in DENIED_SUFFIXES:

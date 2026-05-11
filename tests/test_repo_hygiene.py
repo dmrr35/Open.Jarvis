@@ -31,6 +31,16 @@ class RepoHygieneTests(unittest.TestCase):
         self.assertIn(".env", {item.path for item in items})
         self.assertTrue(next(item for item in items if item.path == ".env").secret)
 
+    def test_find_hygiene_items_flags_real_settings_json(self):
+        with TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "config").mkdir()
+            (root / "config" / "settings.json").write_text('{"settings": {}}', encoding="utf-8")
+
+            items = find_hygiene_items(root, include_secrets=True)
+
+        self.assertIn("config/settings.json", {item.path for item in items})
+
     def test_clean_hygiene_items_removes_generated_files_but_keeps_secrets_by_default(self):
         with TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

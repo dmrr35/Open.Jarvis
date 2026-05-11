@@ -54,7 +54,7 @@ SKIP_SUFFIXES = {
 BLOCKED_FILE_RE = re.compile(
     r"(^|[\\/])("
     r"\.env$|.*\.env$|.*token.*|.*credential.*|.*credentials.*|.*secret.*|"
-    r"memory\.json$|.*\.log$|.*\.jsonl$|.*\.sqlite$|.*\.db$"
+    r"memory\.json$|config[\\/]settings\.json$|.*\.log$|.*\.jsonl$|.*\.sqlite$|.*\.db$"
     r")",
     re.IGNORECASE,
 )

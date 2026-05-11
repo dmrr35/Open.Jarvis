@@ -17,6 +17,7 @@ client_secret*.json
 
 # Local memory, setup, and runtime data
 memory.json
+config/settings.json
 user_data/
 profiles/
 gece_kodlari/

@@ -20,6 +20,7 @@ Open.Jarvis can listen to voice commands, open applications, control the desktop
 
 - Keep real credentials only in a local `.env` file.
 - Commit `.env.example` with placeholders only.
+- Keep `settings.json` limited to non-secret preferences. The v0.6.0 Settings UI shows secret presence only and does not store raw API keys, OAuth secrets, tokens, or signing keys.
 - Run `python repo_hygiene.py --include-secrets` before publishing.
 - Run `python repo_hygiene.py --clean` to remove generated artifacts; add `--include-secrets` only after backing up or rotating local keys.
 - Do not paste API keys, OAuth tokens, Spotify secrets, plugin signing keys, release signing keys, runtime logs, or JSONL event streams into issues.
@@ -47,6 +48,7 @@ This project is pre-release. Treat the current main workspace as the only suppor
 - Run `python -m ruff check .` and `python -m mypy .`.
 - Run `python project_audit.py`.
 - Never commit `.env`, API keys, tokens, generated secrets, or local user data.
+- Never commit real `config/settings.json` files from source or portable runs.
 - Prefer allowlists over blocklists for commands, plugins, and URLs.
 - Add negative tests for plugin permissions, broken plugin hooks, and invalid manifests.
 

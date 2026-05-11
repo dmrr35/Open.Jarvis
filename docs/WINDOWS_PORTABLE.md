@@ -28,6 +28,7 @@ The package must not include `.env`, API keys, Spotify credentials, signing keys
 2. Run `Open.Jarvis/Open.Jarvis.exe`.
 3. Keep the app keyless if you only want local commands.
 4. Copy `.env.example` to `.env` only when you want optional Groq, Spotify, local LLM, voice, or offline STT configuration.
+5. Use the Settings UI for non-secret preferences. Portable saves go to `config/settings.json` inside your extracted copy.
 
 ## Optional Integrations
 
@@ -39,4 +40,8 @@ Portable builds are unsigned unless release notes explicitly say otherwise. Wind
 
 ## Privacy
 
-Do not share `.env`, `logs/`, `memory.json`, screenshots, generated audio, token files, or local config in GitHub issues. Run the artifact verifier before publishing any ZIP.
+Do not share `.env`, `config/settings.json`, `logs/`, `memory.json`, screenshots, generated audio, token files, or local config in GitHub issues. Run the artifact verifier before publishing any ZIP.
+
+## Settings In Portable Mode
+
+The `config/` folder is included as guidance and a writable location for local users. Release packages must not include a real `config/settings.json`; that file is created only when a user saves non-secret settings locally. Secrets still belong in environment variables or a private `.env`, never in `settings.json`.

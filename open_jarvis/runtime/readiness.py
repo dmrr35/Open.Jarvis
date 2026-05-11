@@ -7,6 +7,8 @@ from collections.abc import Callable, Mapping
 
 import speech_recognition as sr
 
+from open_jarvis.runtime.config_runtime import resolved_env
+
 
 def _env_flag_enabled(values: Mapping[str, str], name: str, default: bool = True) -> bool:
     value = values.get(name)
@@ -34,7 +36,7 @@ def emit_startup_readiness(
 ) -> dict[str, bool | str]:
     """Send one startup readiness snapshot to the UI without blocking runtime startup."""
 
-    values = os.environ if env is None else env
+    values = resolved_env(os.environ) if env is None else env
     groq_enabled = _env_flag_enabled(values, "JARVIS_ENABLE_GROQ", default=True)
     spotify_enabled = _env_flag_enabled(values, "JARVIS_ENABLE_SPOTIFY", default=True)
     groq_ready = groq_enabled and bool(values.get("GROQ_API_KEY"))

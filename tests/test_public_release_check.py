@@ -47,6 +47,17 @@ class PublicReleaseCheckTests(unittest.TestCase):
             self.assertTrue(findings)
             self.assertTrue(any("private runtime/credential filename" in finding.reason for finding in findings))
 
+    def test_real_settings_json_fails_as_private_runtime_artifact(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / "config").mkdir()
+            (root / "config" / "settings.json").write_text('{"settings": {}}', encoding="utf-8")
+
+            findings = run_check(root)
+
+            self.assertTrue(findings)
+            self.assertTrue(any("private runtime/credential filename" in finding.reason for finding in findings))
+
     def test_machine_specific_user_path_fails(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

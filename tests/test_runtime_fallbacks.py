@@ -38,6 +38,27 @@ class RuntimeFallbackTests(unittest.TestCase):
         self.assertIn("[WARN] Spotify credentials not found. Spotify integration disabled.", logs)
         self.assertIn("[ERROR] Microphone not detected.", logs)
 
+    def test_emit_startup_readiness_uses_resolved_config_when_env_not_injected(self):
+        logs = []
+        resolved = {
+            "GROQ_API_KEY": "",
+            "JARVIS_ENABLE_GROQ": "false",
+            "SPOTIFY_CLIENT_ID": "",
+            "SPOTIFY_CLIENT_SECRET": "",
+            "JARVIS_ENABLE_SPOTIFY": "false",
+        }
+
+        with patch("open_jarvis.runtime.readiness.resolved_env", return_value=resolved):
+            report = readiness.emit_startup_readiness(
+                send_log=logs.append,
+                microphone_probe=lambda: True,
+                recognition_mode=lambda: "online",
+            )
+
+        self.assertFalse(report["groq"])
+        self.assertFalse(report["spotify"])
+        self.assertTrue(report["microphone"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -32,6 +32,7 @@ HYGIENE_ITEMS = (
     HygieneItem("exports", "generated eval and screenshot artifacts"),
     HygieneItem("logs", "runtime log directory"),
     HygieneItem("memory.json", "local assistant memory data"),
+    HygieneItem("config/settings.json", "local user settings file"),
     HygieneItem("release", "generated release metadata directory"),
 )
 

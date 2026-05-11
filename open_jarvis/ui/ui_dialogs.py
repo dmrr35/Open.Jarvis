@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import tkinter as tk
 from pathlib import Path
 
@@ -14,12 +13,10 @@ from open_jarvis.memory import build_memory_health_report, load_memory
 from open_jarvis.security.jarvis_admin import (
     build_env_template,
     build_health_checks,
-    build_settings_guide,
-    read_env_settings,
     render_health_report,
-    write_env_settings,
 )
 from open_jarvis.ui.memory_panel import build_memory_panel
+from open_jarvis.ui.settings_panel import SettingsPanelModel
 from open_jarvis.ui.ui_theme import PALETTE, font
 
 BG = PALETTE["bg"]
@@ -117,6 +114,8 @@ class SettingsDialog(ctk.CTkToplevel):
         self.grab_set()
 
         self._entries = {}
+        self._settings_model = SettingsPanelModel()
+        self._settings_rows = []
         self._health_box = None
         self._status_label = None
         self._build_ui()
@@ -138,7 +137,7 @@ class SettingsDialog(ctk.CTkToplevel):
         )
         ctk.CTkLabel(
             header,
-            text="Settings are read from .env and can be edited here with safe defaults.",
+            text="Settings are saved to user-local settings.json. Secrets remain environment-only.",
             font=font("ui", 11),
             text_color=TEXT_DIM,
         ).grid(row=1, column=0, padx=18, pady=(0, 16), sticky="w")
@@ -158,23 +157,33 @@ class SettingsDialog(ctk.CTkToplevel):
         scroll.grid(row=0, column=0, sticky="nsew", padx=12, pady=12)
         scroll.grid_columnconfigure(1, weight=1)
 
-        for index, item in enumerate(build_settings_guide()):
-            row = ctk.CTkFrame(scroll, fg_color=CARD, corner_radius=18, border_width=1, border_color=LINE)
-            row.grid(row=index, column=0, sticky="ew", pady=6)
-            row.grid_columnconfigure(1, weight=1)
-
-            ctk.CTkLabel(row, text=item["key"], font=font("mono", 11, "bold"), text_color=BLUE).grid(
-                row=0, column=0, padx=12, pady=(10, 2), sticky="w"
+        index = 0
+        view_model = self._settings_model.view_model()
+        for group_name, rows in view_model["groups"].items():
+            ctk.CTkLabel(scroll, text=group_name.upper(), font=font("mono", 11, "bold"), text_color=TEXT_DIM).grid(
+                row=index, column=0, sticky="w", padx=4, pady=(12, 4)
             )
-            ctk.CTkLabel(row, text=f"Safe default: {item['safe_default']}", font=font("mono", 9), text_color=TEXT_DIM).grid(
-                row=0, column=1, padx=12, pady=(10, 2), sticky="e"
-            )
-            ctk.CTkLabel(
-                row, text=item["description"], font=font("ui", 11), text_color=PALETTE["text"], wraplength=420, justify="left"
-            ).grid(row=1, column=0, columnspan=2, padx=12, pady=(0, 8), sticky="w")
-            entry = ctk.CTkEntry(row, placeholder_text=item["default"], font=font("mono", 11), corner_radius=12)
-            entry.grid(row=2, column=0, columnspan=2, padx=12, pady=(0, 12), sticky="ew")
-            self._entries[item["key"]] = entry
+            index += 1
+            for item in rows:
+                row = ctk.CTkFrame(scroll, fg_color=CARD, corner_radius=18, border_width=1, border_color=LINE)
+                row.grid(row=index, column=0, sticky="ew", pady=6)
+                row.grid_columnconfigure(1, weight=1)
+                ctk.CTkLabel(row, text=item["label"], font=font("mono", 11, "bold"), text_color=BLUE).grid(
+                    row=0, column=0, padx=12, pady=(10, 2), sticky="w"
+                )
+                ctk.CTkLabel(row, text=item["key"], font=font("mono", 9), text_color=TEXT_DIM).grid(
+                    row=0, column=1, padx=12, pady=(10, 2), sticky="e"
+                )
+                if item["editable"]:
+                    entry = ctk.CTkEntry(row, font=font("mono", 11), corner_radius=12)
+                    entry.grid(row=1, column=0, columnspan=2, padx=12, pady=(0, 12), sticky="ew")
+                    self._entries[item["key"]] = entry
+                    self._settings_rows.append(item)
+                else:
+                    ctk.CTkLabel(row, text=str(item["value"]).upper(), font=font("mono", 11), text_color=GREEN).grid(
+                        row=1, column=0, columnspan=2, padx=12, pady=(0, 12), sticky="w"
+                    )
+                index += 1
 
         right = ctk.CTkFrame(self, fg_color=BG2, corner_radius=28, border_width=1, border_color=LINE)
         right.grid(row=1, column=1, padx=(9, 18), pady=18, sticky="nsew")
@@ -196,24 +205,23 @@ class SettingsDialog(ctk.CTkToplevel):
         ctk.CTkButton(footer, text="Close", fg_color="#4a1f1f", command=self._close).pack(side="right")
 
     def _load_values(self):
-        settings = read_env_settings()
-        for key, entry in self._entries.items():
+        for item in self._settings_rows:
+            entry = self._entries[item["key"]]
             entry.delete(0, "end")
-            entry.insert(0, settings.get(key, ""))
+            entry.insert(0, str(item["value"]))
 
     def _current_settings(self):
         return {key: entry.get().strip() for key, entry in self._entries.items()}
 
     def _refresh_health(self):
-        current = self._current_settings()
-        checks = build_health_checks(env=current)
+        checks = build_health_checks(env=self._settings_model.manager.as_env_mapping())
         report = render_health_report(checks)
         self._health_box.configure(state="normal")
         self._health_box.delete("1.0", "end")
         self._health_box.insert("end", report)
         self._health_box.configure(state="disabled")
         self._status_label.configure(
-            text="Changes are saved to .env. Runtime-sensitive values like the wake word and microphone threshold take effect after restarting JARVIS."
+            text="Non-secret settings are saved to settings.json. API keys and client secrets stay in your environment or .env."
         )
 
     def _copy_template(self):
@@ -223,12 +231,14 @@ class SettingsDialog(ctk.CTkToplevel):
 
     def _save(self):
         settings = self._current_settings()
-        write_env_settings(settings)
-        os.environ.update(settings)
+        result = self._settings_model.save(settings)
         self._refresh_health()
         if self.on_saved:
             self.on_saved(settings)
-        self._status_label.configure(text="Saved settings to .env. Restart JARVIS to apply runtime-sensitive changes.")
+        if result["status"] == "saved":
+            self._status_label.configure(text=f"Saved non-secret settings to {result['path']}. Restart JARVIS for runtime-sensitive changes.")
+        else:
+            self._status_label.configure(text="Settings were not saved: " + "; ".join(result.get("errors", [])))
 
     def _close(self):
         self.grab_release()

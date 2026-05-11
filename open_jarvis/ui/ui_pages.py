@@ -10,6 +10,7 @@ import psutil
 
 from open_jarvis.health.observability import build_latency_snapshot, build_slo_report
 from open_jarvis.integrations.llm_fallback import describe_ai_status
+from open_jarvis.runtime.config_runtime import resolved_env
 from open_jarvis.ui.security_center import build_security_overview
 from open_jarvis.ui.ui_theme import PALETTE, font
 
@@ -98,7 +99,7 @@ def refresh_info_page(frame: ctk.CTkFrame, page_key: str) -> None:
 
 
 def _build_page_values(page_key: str) -> dict[str, tuple[str, str, str]]:
-    env = os.environ
+    env = resolved_env(os.environ)
     if page_key == "system":
         disk = psutil.disk_usage(os.getcwd())
         latency = build_latency_snapshot()

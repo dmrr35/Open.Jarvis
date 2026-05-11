@@ -41,6 +41,8 @@ The format follows Keep a Changelog, and this project uses semantic versioning o
 - Added voice setup and troubleshooting documentation for optional wake-word, push-to-talk, microphone, TTS, and offline STT behavior.
 - Added v0.5.0 Windows portable package policy, dry-run build workflow, artifact verifier, and release-focused tests.
 - Added Windows portable usage and build documentation with SmartScreen, privacy, and cleanup guidance.
+- Added v0.6.0 configuration foundations: typed non-secret settings schema, ConfigManager, user-local and portable-aware paths, validation diagnostics, safe export, environment compatibility bridge, and Settings UI model.
+- Added release-safety coverage to keep real `config/settings.json` files out of source and portable packages.
 
 ### Changed
 
@@ -74,6 +76,7 @@ The format follows Keep a Changelog, and this project uses semantic versioning o
 - Hardened wake-word listener matching to use normalized whole-token detection and wake-word disabled mode.
 - Expanded `.env.example` with optional voice, wake-word, push-to-talk, and TTS flags.
 - Kept portable packaging additive to the source workflow and documented full installer support as future work.
+- Updated the Settings UI path so non-secret preferences save through ConfigManager instead of writing raw `.env` files.
 
 ### Verified
 
