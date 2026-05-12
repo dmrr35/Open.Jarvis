@@ -28,6 +28,11 @@ DENIED_SUFFIXES = {".pyc", ".log", ".jsonl", ".wav", ".mp3", ".m4a"}
 GENERATED_IMAGE_SUFFIXES = {".screenshot", ".capture"}
 SUSPICIOUS_FILENAME_RE = re.compile(r"(token|credential|credentials|secret|signing[-_]?key)", re.IGNORECASE)
 WINDOWS_USER_PATH_RE = re.compile(r"C:\\Users\\", re.IGNORECASE)
+ALLOWED_PYINSTALLER_INTERNAL_PATHS = {
+    "_internal/base_library.zip",
+    "_internal/speech_recognition/flac-win32.exe",
+    "_internal/speech_recognition/flac-win64.exe",
+}
 
 
 def build_artifact_name(version: str, app_name: str = DEFAULT_APP_NAME) -> str:
@@ -78,6 +83,8 @@ def is_denied_portable_path(path: str, *, app_name: str = DEFAULT_APP_NAME) -> d
         return {"denied": True, "reason": "real settings.json files are not allowed"}
     if name_lower == "memory.json" or name_lower.startswith("private_memory"):
         return {"denied": True, "reason": "private memory files are not allowed"}
+    if _is_allowed_pyinstaller_internal(normalized, app_name=app_name):
+        return {"denied": False, "reason": ""}
     if suffix in DENIED_SUFFIXES:
         return {"denied": True, "reason": f"{suffix} files are not allowed"}
     if suffix in {".png", ".jpg", ".jpeg"} and any(marker in name_lower for marker in GENERATED_IMAGE_SUFFIXES):
@@ -91,6 +98,14 @@ def is_denied_portable_path(path: str, *, app_name: str = DEFAULT_APP_NAME) -> d
     if WINDOWS_USER_PATH_RE.search(path):
         return {"denied": True, "reason": "local Windows user path is not allowed"}
     return {"denied": False, "reason": ""}
+
+
+def _is_allowed_pyinstaller_internal(normalized: str, *, app_name: str) -> bool:
+    prefix = f"{app_name}/"
+    if not normalized.startswith(prefix):
+        return False
+    relative = normalized[len(prefix) :]
+    return relative in ALLOWED_PYINSTALLER_INTERNAL_PATHS
 
 
 def portable_layout(version: str, app_name: str = DEFAULT_APP_NAME) -> dict[str, object]:

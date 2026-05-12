@@ -18,6 +18,18 @@ from open_jarvis.release.portable_policy import (
 
 TEXT_SUFFIXES = {".txt", ".md", ".json", ".example", ".ini", ".cfg", ".toml", ".yaml", ".yml"}
 SECRET_RE = re.compile(r"(gsk_[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9_-]{20,}|authorization\s*[:=]|bearer\s+|api_key\s*=\s*\S+)", re.IGNORECASE)
+REAL_SECRET_RE = re.compile(r"(gsk_[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9_-]{20,}|authorization\s*[:=]|bearer\s+)", re.IGNORECASE)
+SENSITIVE_ENV_ASSIGN_RE = re.compile(
+    r"^\s*([A-Z][A-Z0-9_]*(?:API_KEY|TOKEN|SECRET|PASSWORD|PRIVATE_KEY|SIGNING_KEY)[A-Z0-9_]*)=(.+?)\s*$",
+)
+SAFE_PLACEHOLDER_VALUES = {
+    "",
+    "false",
+    "true",
+    "your_groq_api_key_here",
+    "your_spotify_client_secret_here",
+    "your_gemini_api_key_here",
+}
 LOCAL_PATH_RE = re.compile(r"C:\\Users\\", re.IGNORECASE)
 
 
@@ -39,11 +51,35 @@ def _scan_text(path: str, content: bytes) -> list[ArtifactFinding]:
     except UnicodeDecodeError:
         return []
     findings: list[ArtifactFinding] = []
+    if Path(path).name == ".env.example":
+        return _scan_env_example(path, text)
     if SECRET_RE.search(text):
         findings.append(ArtifactFinding(path, "suspicious secret-like text"))
     if LOCAL_PATH_RE.search(text):
         findings.append(ArtifactFinding(path, "local path leakage"))
     return findings
+
+
+def _scan_env_example(path: str, text: str) -> list[ArtifactFinding]:
+    findings: list[ArtifactFinding] = []
+    if REAL_SECRET_RE.search(text):
+        findings.append(ArtifactFinding(path, "suspicious secret-like text"))
+    for line in text.splitlines():
+        match = SENSITIVE_ENV_ASSIGN_RE.match(line.strip())
+        if not match:
+            continue
+        _key, value = match.groups()
+        if not _is_safe_placeholder(value):
+            findings.append(ArtifactFinding(path, "suspicious secret-like text"))
+            break
+    if LOCAL_PATH_RE.search(text):
+        findings.append(ArtifactFinding(path, "local path leakage"))
+    return findings
+
+
+def _is_safe_placeholder(value: str) -> bool:
+    cleaned = value.strip().strip("'\"").lower()
+    return cleaned in SAFE_PLACEHOLDER_VALUES or cleaned.startswith("your_") or cleaned.endswith("_here")
 
 
 def _verify_names(names: list[str], *, app_name: str) -> list[ArtifactFinding]:

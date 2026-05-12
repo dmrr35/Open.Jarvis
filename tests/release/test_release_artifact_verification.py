@@ -13,7 +13,7 @@ def _write_valid_package(root: Path) -> Path:
     (app / "Open.Jarvis.exe").write_bytes(b"fake exe")
     (portable / "README_FIRST.txt").write_text("Read this first.\n", encoding="utf-8")
     (portable / "LICENSE").write_text("MIT\n", encoding="utf-8")
-    (portable / ".env.example").write_text("GROQ_API_KEY=\n", encoding="utf-8")
+    (portable / ".env.example").write_text("GROQ_API_KEY=YOUR_GROQ_API_KEY_HERE\nSPOTIFY_CLIENT_SECRET=\n", encoding="utf-8")
     return portable
 
 
@@ -55,6 +55,19 @@ class ReleaseArtifactVerificationTest(TestCase):
             self.assertIn(".env", reasons)
             self.assertIn("log", reasons)
             self.assertIn("unexpected executable", reasons)
+
+    def test_allows_expected_pyinstaller_internal_runtime_files(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            portable = _write_valid_package(Path(temp_dir))
+            internal = portable / "Open.Jarvis" / "_internal"
+            speech_recognition = internal / "speech_recognition"
+            speech_recognition.mkdir(parents=True)
+            (internal / "base_library.zip").write_bytes(b"pyinstaller runtime archive")
+            (speech_recognition / "flac-win32.exe").write_bytes(b"flac helper")
+
+            result = verify_release_artifact(portable)
+
+            self.assertTrue(result["passed"], result["findings"])
 
     def test_rejects_local_path_leakage(self):
         with tempfile.TemporaryDirectory() as temp_dir:

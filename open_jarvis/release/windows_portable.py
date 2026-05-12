@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
+import stat
 import subprocess
 import sys
 from collections.abc import Callable, Sequence
@@ -64,8 +66,16 @@ def build_windows_portable_plan(
 
 def _copy_tree(source: Path, target: Path) -> None:
     if target.exists():
-        shutil.rmtree(target)
+        _remove_tree(target)
     shutil.copytree(source, target)
+
+
+def _remove_tree(target: Path) -> None:
+    def handle_remove_error(function, path, _exc_info):
+        os.chmod(path, stat.S_IWRITE)
+        function(path)
+
+    shutil.rmtree(target, onerror=handle_remove_error)
 
 
 def assemble_portable_package(
@@ -84,7 +94,7 @@ def assemble_portable_package(
     if not exe.exists():
         raise FileNotFoundError(f"Expected executable not found: {exe}")
     if output.exists():
-        shutil.rmtree(output)
+        _remove_tree(output)
     output.mkdir(parents=True)
     _copy_tree(built, output / app_name)
     for required in ("LICENSE", ".env.example"):
@@ -110,6 +120,17 @@ def assemble_portable_package(
     return {"status": "assembled" if verification["passed"] else "failed", "portable_dir": str(output), "verification": verification}
 
 
+def create_portable_zip(*, portable_dir: str | Path, zip_path: str | Path, app_name: str = DEFAULT_APP_NAME) -> dict[str, object]:
+    portable = Path(portable_dir)
+    archive = Path(zip_path)
+    if archive.exists():
+        archive.unlink()
+    archive.parent.mkdir(parents=True, exist_ok=True)
+    shutil.make_archive(str(archive.with_suffix("")), "zip", root_dir=portable)
+    verification = verify_release_artifact(archive, app_name=app_name)
+    return {"status": "zipped" if verification["passed"] else "failed", "zip_path": str(archive), "verification": verification}
+
+
 def _default_runner(command: Sequence[str]) -> int:
     return subprocess.run(list(command), check=False).returncode
 
@@ -130,13 +151,23 @@ def run_windows_portable_build(
     if dry_run:
         return {"status": "dry_run", "plan": plan}
     if clean and output_path.exists():
-        shutil.rmtree(output_path)
+        _remove_tree(output_path)
     if not skip_pyinstaller:
+        if clean:
+            _clean_pyinstaller_outputs(app_name=app_name)
         exit_code = (runner or _default_runner)(plan["pyinstaller_command"])
         if exit_code != 0:
             return {"status": "failed", "reason": "pyinstaller failed", "exit_code": exit_code, "plan": plan}
     assembly = assemble_portable_package(repo_root=".", built_app_dir=plan["built_app_dir"], portable_dir=plan["portable_dir"], app_name=app_name)
-    return {"status": assembly["status"], "plan": plan, "assembly": assembly}
+    if assembly["status"] != "assembled":
+        return {"status": assembly["status"], "plan": plan, "assembly": assembly}
+    archive = create_portable_zip(portable_dir=plan["portable_dir"], zip_path=plan["zip_path"], app_name=app_name)
+    return {
+        "status": "assembled" if archive["status"] == "zipped" else "failed",
+        "plan": plan,
+        "assembly": assembly,
+        "archive": archive,
+    }
 
 
 def render_plan(result: dict[str, object]) -> str:
@@ -150,6 +181,15 @@ def render_plan(result: dict[str, object]) -> str:
         "  " + " ".join(plan["pyinstaller_command"]),
     ]
     return "\n".join(lines) + "\n"
+
+
+def _clean_pyinstaller_outputs(*, app_name: str) -> None:
+    for target in (Path("dist") / app_name, Path("build") / app_name):
+        if target.exists():
+            _remove_tree(target)
+    spec_file = Path(f"{app_name}.spec")
+    if spec_file.exists():
+        spec_file.unlink()
 
 
 def main(argv: list[str] | None = None) -> int:
